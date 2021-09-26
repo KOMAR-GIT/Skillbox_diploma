@@ -13,7 +13,7 @@ public class Tag2Post {
     @JoinColumn(nullable = false, name = "post_id")
     private Post post_id;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(nullable = false, name = "tag_id")
     private Tag tag_id;
 
