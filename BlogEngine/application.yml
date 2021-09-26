@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/booklib?useSSL=false
     username: root
-    password: #YOUR_PASSWORD#
+    password: 082819MCU1Lv
   jpa:
     hibernate:
       ddl-auto: none
