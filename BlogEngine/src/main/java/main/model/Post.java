@@ -1,9 +1,11 @@
-package model;
+package main.model;
 
 import javax.persistence.*;
 import javax.xml.crypto.Data;
+import java.util.Date;
 
 @Entity(name = "posts")
+@Table
 public class Post {
 
     @Id
@@ -25,8 +27,8 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(columnDefinition = "DATETIME", nullable = false)
-    private Data time;
+    @Column(nullable = false)
+    private Date time;
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String title;
@@ -78,11 +80,11 @@ public class Post {
         this.user = user;
     }
 
-    public Data getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(Data time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 

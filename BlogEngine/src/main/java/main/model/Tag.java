@@ -1,15 +1,16 @@
-package model;
+package main.model;
 
 import javax.persistence.*;
 
 @Entity(name = "tags")
+@Table
 public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    @Column(columnDefinition = "VARCHAR(255)", nullable = true)
     private String name;
 
     public int getId() {

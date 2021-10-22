@@ -1,9 +1,10 @@
-package model;
+package main.model;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "captcha_codes")
+@Table
 public class CaptchaCode {
 
     @Id

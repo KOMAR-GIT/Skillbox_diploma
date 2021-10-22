@@ -1,9 +1,10 @@
-package model;
+package main.model;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "post_votes")
+@Table
 public class PostVotes {
 
     @Id

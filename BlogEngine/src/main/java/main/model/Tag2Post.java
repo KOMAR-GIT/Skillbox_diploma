@@ -1,8 +1,9 @@
-package model;
+package main.model;
 
 import javax.persistence.*;
 
 @Entity(name = "tag2post")
+@Table
 public class Tag2Post {
 
     @Id
