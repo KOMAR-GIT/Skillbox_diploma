@@ -18,4 +18,7 @@ public class GlobalSetting {
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String value;
+
+    public GlobalSetting() {
+    }
 }

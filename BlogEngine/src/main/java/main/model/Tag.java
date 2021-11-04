@@ -13,6 +13,9 @@ public class Tag {
     @Column(columnDefinition = "VARCHAR(255)", nullable = true)
     private String name;
 
+    public Tag() {
+    }
+
     public int getId() {
         return id;
     }

@@ -20,6 +20,9 @@ public class CaptchaCode {
     @Column(columnDefinition = "TINYTEXT", nullable = false)
     private String secret_code;
 
+    public CaptchaCode() {
+    }
+
     public int getId() {
         return id;
     }

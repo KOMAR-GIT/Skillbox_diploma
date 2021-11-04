@@ -18,6 +18,9 @@ public class Tag2Post {
     @JoinColumn(nullable = false, name = "tag_id")
     private Tag tag_id;
 
+    public Tag2Post() {
+    }
+
     public int getId() {
         return id;
     }

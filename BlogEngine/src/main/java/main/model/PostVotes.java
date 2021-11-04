@@ -25,6 +25,9 @@ public class PostVotes {
     @Column(columnDefinition = "TINYINT", nullable = false)
     private boolean value;
 
+    public PostVotes() {
+    }
+
     public int getId() {
         return id;
     }

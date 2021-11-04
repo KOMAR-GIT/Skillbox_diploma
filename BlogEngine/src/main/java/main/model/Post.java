@@ -39,6 +39,9 @@ public class Post {
     @Column(nullable = false)
     private int view_count;
 
+    public Post() {
+    }
+
 
     public int getId() {
         return id;

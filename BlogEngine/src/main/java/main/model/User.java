@@ -32,6 +32,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String photo;
 
+    public User() {
+    }
+
     public int getId() {
         return id;
     }
