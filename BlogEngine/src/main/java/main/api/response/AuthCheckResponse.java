@@ -1,5 +1,6 @@
 package main.api.response;
 
+import main.dto.UserDTO;
 import main.model.User;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +9,7 @@ public class AuthCheckResponse {
 
     private boolean result;
 
-    private User user;
+    private UserDTO user;
 
     public AuthCheckResponse() {
     }
@@ -28,11 +29,11 @@ public class AuthCheckResponse {
         this.result = result;
     }
 
-    public User getUser() {
+    public UserDTO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDTO user) {
         this.user = user;
     }
 }

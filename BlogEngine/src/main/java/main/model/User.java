@@ -11,11 +11,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(columnDefinition = "TINYINT", nullable = false)
-    private boolean is_moderator;
+    @Column(name = "is_moderator", columnDefinition = "TINYINT", nullable = false)
+    private boolean isModerator;
 
-    @Column(columnDefinition = "DATETIME", nullable = false)
-    private Date reg_time;
+    @Column(name = "reg_time", columnDefinition = "DATETIME", nullable = false)
+    private Date regTime;
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String name;
@@ -26,13 +26,24 @@ public class User {
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String password;
 
-    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    @Column(columnDefinition = "VARCHAR(255)")
     private String code;
 
     @Column(columnDefinition = "TEXT")
     private String photo;
 
     public User() {
+    }
+
+    public User(int id, boolean isModerator, Date regTime, String name, String email, String password, String code, String photo) {
+        this.id = id;
+        this.isModerator = isModerator;
+        this.regTime = regTime;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.code = code;
+        this.photo = photo;
     }
 
     public int getId() {
@@ -43,20 +54,20 @@ public class User {
         this.id = id;
     }
 
-    public Boolean getIs_moderator() {
-        return is_moderator;
+    public Boolean getModerator() {
+        return isModerator;
     }
 
-    public void setIs_moderator(Boolean is_moderator) {
-        this.is_moderator = is_moderator;
+    public void setModerator(Boolean moderator) {
+        this.isModerator = moderator;
     }
 
-    public Date getReg_time() {
-        return reg_time;
+    public Date getRegTime() {
+        return regTime;
     }
 
-    public void setReg_time(Date reg_time) {
-        this.reg_time = reg_time;
+    public void setRegTime(Date regTime) {
+        this.regTime = regTime;
     }
 
     public String getName() {

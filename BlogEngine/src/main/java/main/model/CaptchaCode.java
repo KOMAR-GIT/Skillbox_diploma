@@ -17,8 +17,8 @@ public class CaptchaCode {
     @Column(columnDefinition = "TINYTEXT", nullable = false)
     private String code;
 
-    @Column(columnDefinition = "TINYTEXT", nullable = false)
-    private String secret_code;
+    @Column(name = "secret_code", columnDefinition = "TINYTEXT", nullable = false)
+    private String secretCode;
 
     public CaptchaCode() {
     }
@@ -47,11 +47,11 @@ public class CaptchaCode {
         this.code = code;
     }
 
-    public String getSecret_code() {
-        return secret_code;
+    public String getSecretCode() {
+        return secretCode;
     }
 
-    public void setSecret_code(String secret_code) {
-        this.secret_code = secret_code;
+    public void setSecretCode(String secretCode) {
+        this.secretCode = secretCode;
     }
 }

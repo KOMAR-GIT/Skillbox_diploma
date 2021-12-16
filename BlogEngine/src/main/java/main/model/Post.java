@@ -12,11 +12,11 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(columnDefinition = "tinyint", nullable = false)
-    private boolean is_active;
+    @Column(name = "is_active", columnDefinition = "tinyint", nullable = false)
+    private boolean isActive;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM", nullable = false)
+    @Column(name = "moderation_status", nullable = false, columnDefinition = "enum('NEW', 'ACCEPTED', 'DECLINED')")
     private ModerationStatus moderationStatus;
 
     @ManyToOne
@@ -36,11 +36,12 @@ public class Post {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
 
-    @Column(nullable = false)
-    private int view_count;
+    @Column(name = "view_count", nullable = false)
+    private int viewCount;
 
     public Post() {
     }
+
 
 
     public int getId() {
@@ -51,13 +52,6 @@ public class Post {
         this.id = id;
     }
 
-    public boolean isIs_active() {
-        return is_active;
-    }
-
-    public void setIs_active(boolean is_active) {
-        this.is_active = is_active;
-    }
 
     public ModerationStatus getModerationStatus() {
         return moderationStatus;
@@ -65,6 +59,14 @@ public class Post {
 
     public void setModerationStatus(ModerationStatus moderationStatus) {
         this.moderationStatus = moderationStatus;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public User getModerator() {
@@ -79,7 +81,7 @@ public class Post {
         return user;
     }
 
-    public void setUser_id(User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -107,11 +109,11 @@ public class Post {
         this.text = text;
     }
 
-    public int getView_count() {
-        return view_count;
+    public int getViewCount() {
+        return viewCount;
     }
 
-    public void setView_count(int view_count) {
-        this.view_count = view_count;
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 }

@@ -12,11 +12,11 @@ public class Tag2Post {
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "post_id")
-    private Post post_id;
+    private Post postId;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "tag_id")
-    private Tag tag_id;
+    private Tag tagId;
 
     public Tag2Post() {
     }
@@ -29,19 +29,19 @@ public class Tag2Post {
         this.id = id;
     }
 
-    public Post getPost_id() {
-        return post_id;
+    public Post getPostId() {
+        return postId;
     }
 
-    public void setPost_id(Post post_id) {
-        this.post_id = post_id;
+    public void setPostId(Post postId) {
+        this.postId = postId;
     }
 
-    public Tag getTag_id() {
-        return tag_id;
+    public Tag getTagId() {
+        return tagId;
     }
 
-    public void setTag_id(Tag tag_id) {
-        this.tag_id = tag_id;
+    public void setTagId(Tag tagId) {
+        this.tagId = tagId;
     }
 }
