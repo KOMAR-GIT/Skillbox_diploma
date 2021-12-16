@@ -34,6 +34,9 @@ public class PostsService {
         return posts;
     }
 
+    public long getAllPostsCount(){
+        return postRepository.count();
+    }
 
 
 

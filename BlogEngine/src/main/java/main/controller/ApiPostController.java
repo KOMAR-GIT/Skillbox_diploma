@@ -29,15 +29,6 @@ public class ApiPostController {
     PostsService postsService;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PostCommentRepository postCommentRepository;
-
-    @Autowired
-    PostVotesRepository postVotesRepository;
-
-    @Autowired
     ModelMapper modelMapper;
 
 
@@ -60,7 +51,7 @@ public class ApiPostController {
         postDto.convertTimeToTimestamp(post.getTimestamp());
         postDto.setUser(new UserDtoForPost(post.getUserId(), post.getName()));
 
-        System.out.println(postDto.getId() + " " + postDto.getTimestamp().getTime());
+
         return postDto;
     }
 

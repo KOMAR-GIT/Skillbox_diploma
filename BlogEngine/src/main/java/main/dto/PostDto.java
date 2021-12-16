@@ -8,7 +8,7 @@ import java.util.Date;
 public class PostDto {
 
     private int id;
-    private Timestamp timestamp;
+    private long timestamp;
     private UserDtoForPost user;
     private String title;
     private String announce;
@@ -25,7 +25,7 @@ public class PostDto {
     }
 
     public void convertTimeToTimestamp(Date time){
-        timestamp = Timestamp.valueOf(String.valueOf(time));
+        timestamp = Timestamp.valueOf(String.valueOf(time)).getTime() / 1000;
     }
 
     public int getId() {
@@ -36,11 +36,11 @@ public class PostDto {
         this.id = id;
     }
 
-    public Timestamp getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
