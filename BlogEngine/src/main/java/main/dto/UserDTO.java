@@ -2,19 +2,19 @@ package main.dto;
 
 public class UserDTO {
 
-    private int id;
+    private Integer id;
     private String name;
     private String photo;
     private String email;
-    private boolean moderation;
-    private int moderationCount;
-    private boolean settings;
+    private Boolean moderation;
+    private Integer moderationCount;
+    private Boolean settings;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -42,27 +42,27 @@ public class UserDTO {
         this.email = email;
     }
 
-    public boolean isModeration() {
+    public Boolean isModeration() {
         return moderation;
     }
 
-    public void setModeration(boolean moderation) {
+    public void setModeration(Boolean moderation) {
         this.moderation = moderation;
     }
 
-    public int getModerationCount() {
+    public Integer getModerationCount() {
         return moderationCount;
     }
 
-    public void setModerationCount(int moderationCount) {
+    public void setModerationCount(Integer moderationCount) {
         this.moderationCount = moderationCount;
     }
 
-    public boolean isSettings() {
+    public Boolean isSettings() {
         return settings;
     }
 
-    public void setSettings(boolean settings) {
+    public void setSettings(Boolean settings) {
         this.settings = settings;
     }
 }

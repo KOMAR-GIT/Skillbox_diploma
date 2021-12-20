@@ -4,7 +4,7 @@ public class TagDTO {
 
     private String tag;
 
-    private double weight;
+    private Double weight;
 
     public String getTag() {
         return tag;
@@ -14,11 +14,11 @@ public class TagDTO {
         this.tag = tag;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 }

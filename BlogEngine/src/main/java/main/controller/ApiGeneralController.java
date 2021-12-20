@@ -5,7 +5,6 @@ import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.dto.TagDTO;
 import main.dto.TagInterface;
-import main.repository.PostRepository;
 import main.service.PostsService;
 import main.service.SettingsService;
 import main.service.TagsService;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -56,7 +54,7 @@ public class ApiGeneralController {
     @GetMapping("/api/tag")
     private ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
         List<TagInterface> tagInterfaces = tagsService.getTags(query);
-        int maxTagsCount = tagInterfaces.stream().map(TagInterface::getTagCount).max(Comparator.comparing(Integer::intValue)).get();
+        Integer maxTagsCount = tagInterfaces.stream().map(TagInterface::getTagCount).max(Comparator.comparing(Integer::intValue)).get();
         TagResponse tagResponse = new TagResponse(
                 tagInterfaces.stream().map(t -> convertTagToTagDTO(t,maxTagsCount)).collect(Collectors.toList()));
 
@@ -66,8 +64,8 @@ public class ApiGeneralController {
     private TagDTO convertTagToTagDTO(TagInterface tagInterface, int maxCount) {
         TagDTO tagDTO = new TagDTO();
         tagDTO.setTag(tagInterface.getTag());
-        double dWeightTag = (double) tagInterface.getTagCount() / postsService.getAllPostsCount();
-        double tagWeight = dWeightTag * (1.0/ (double) maxCount / postsService.getAllPostsCount());
+        Double dWeightTag = (double) tagInterface.getTagCount() / postsService.getAllPostsCount();
+        Double tagWeight = dWeightTag * (1.0/ (double) maxCount / postsService.getAllPostsCount());
         tagDTO.setWeight(tagWeight);
         return tagDTO;
     }

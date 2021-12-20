@@ -10,10 +10,10 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @Column(name = "is_active", columnDefinition = "tinyint", nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", nullable = false, columnDefinition = "enum('NEW', 'ACCEPTED', 'DECLINED')")
@@ -37,18 +37,18 @@ public class Post {
     private String text;
 
     @Column(name = "view_count", nullable = false)
-    private int viewCount;
+    private Integer viewCount;
 
     public Post() {
     }
 
 
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -61,11 +61,11 @@ public class Post {
         this.moderationStatus = moderationStatus;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         isActive = active;
     }
 
@@ -109,11 +109,11 @@ public class Post {
         this.text = text;
     }
 
-    public int getViewCount() {
+    public Integer getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(int viewCount) {
+    public void setViewCount(Integer viewCount) {
         this.viewCount = viewCount;
     }
 }

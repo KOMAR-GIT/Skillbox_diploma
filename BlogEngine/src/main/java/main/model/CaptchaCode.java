@@ -9,7 +9,7 @@ public class CaptchaCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @Column(columnDefinition = "DATETIME", nullable = false)
     private Date time;
@@ -23,11 +23,11 @@ public class CaptchaCode {
     public CaptchaCode() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

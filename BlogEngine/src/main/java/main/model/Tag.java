@@ -8,7 +8,7 @@ public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = true)
     private String name;
@@ -16,11 +16,11 @@ public class Tag {
     public Tag() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

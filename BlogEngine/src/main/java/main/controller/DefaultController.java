@@ -16,7 +16,6 @@ public class DefaultController {
     @RequestMapping("/")
     public String index()
     {
-        tagRepository.save(new Tag());
         return "index";
 
     }

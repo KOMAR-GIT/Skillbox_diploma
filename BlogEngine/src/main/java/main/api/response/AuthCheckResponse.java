@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthCheckResponse {
 
-    private boolean result;
+    private Boolean result;
 
     private UserDTO user;
 
@@ -21,11 +21,11 @@ public class AuthCheckResponse {
         }
     }
 
-    public boolean isResult() {
+    public Boolean isResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+    public void setResult(Boolean result) {
         this.result = result;
     }
 

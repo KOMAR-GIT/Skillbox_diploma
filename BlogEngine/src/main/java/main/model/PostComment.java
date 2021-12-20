@@ -9,7 +9,7 @@ public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
@@ -32,11 +32,11 @@ public class PostComment {
     public PostComment() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -5,33 +5,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SettingsResponse {
 
     @JsonProperty("MULTIUSER_MODE")
-    private boolean multiuserMode;
+    private Boolean multiuserMode;
     @JsonProperty("POST_PREMODERATION")
-    private boolean postPremoderation;
+    private Boolean postPremoderation;
     @JsonProperty("STATISTICS_IS_PUBLIC")
-    private boolean statisticIsPublic;
+    private Boolean statisticIsPublic;
 
-    public boolean isMultiuserMode() {
+    public Boolean isMultiuserMode() {
         return multiuserMode;
     }
 
-    public void setMultiuserMode(boolean multiuserMode) {
+    public void setMultiuserMode(Boolean multiuserMode) {
         this.multiuserMode = multiuserMode;
     }
 
-    public boolean isPostPremoderation() {
+    public Boolean isPostPremoderation() {
         return postPremoderation;
     }
 
-    public void setPostPremoderation(boolean postPremoderation) {
+    public void setPostPremoderation(Boolean postPremoderation) {
         this.postPremoderation = postPremoderation;
     }
 
-    public boolean isStatisticIsPublic() {
+    public Boolean isStatisticIsPublic() {
         return statisticIsPublic;
     }
 
-    public void setStatisticIsPublic(boolean statisticIsPublic) {
+    public void setStatisticIsPublic(Boolean statisticIsPublic) {
         this.statisticIsPublic = statisticIsPublic;
     }
 }

@@ -8,7 +8,7 @@ public class GlobalSetting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String code;

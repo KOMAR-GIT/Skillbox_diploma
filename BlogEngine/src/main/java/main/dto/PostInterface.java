@@ -7,11 +7,11 @@ import java.util.Date;
 
 public interface PostInterface {
 
-    int getId();
+    Integer getId();
 
     Date getTimestamp();
 
-    int getUserId();
+    Integer getUserId();
 
     String getName();
 
@@ -19,13 +19,13 @@ public interface PostInterface {
 
     String getAnnounce();
 
-    int getLikeCount();
+    Integer getLikeCount();
 
-    int getDislikeCount();
+    Integer getDislikeCount();
 
-    int getCommentCount();
+    Integer getCommentCount();
 
-    int getViewCount();
+    Integer getViewCount();
 
 
 }

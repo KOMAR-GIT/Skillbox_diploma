@@ -8,7 +8,7 @@ public class Tag2Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "post_id")
@@ -21,11 +21,11 @@ public class Tag2Post {
     public Tag2Post() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

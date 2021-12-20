@@ -5,6 +5,7 @@ import main.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,14 +24,19 @@ public class PostsService {
         Page<PostInterface> posts;
         switch (mode){
             case early:
-                posts = postRepository.getPostsOrderBy("p.time", "asc", PageRequest.of(offset, limit));
+                posts = postRepository.getPostsOrderBy("p.time desc", PageRequest.of(offset, limit));
+                break;
             case best:
             case popular:
-                posts = postRepository.getPostsOrderBy("commentCount", "asc", PageRequest.of(offset, limit));
+                posts = postRepository.getPostsOrderBy("commentCount", PageRequest.of(offset, limit));
+                break;
             case recent:
             default:
-                posts = postRepository.getPostsOrderBy("p.time", "desc", PageRequest.of(offset, limit));
+                posts = postRepository.getPostsOrderBy("posts.time asc", PageRequest.of(offset, limit));
+                break;
         }
+
+        System.out.println(posts.getContent().get(0).getId());
         return posts;
     }
 

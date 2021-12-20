@@ -7,19 +7,19 @@ import java.util.Date;
 
 public class PostDto {
 
-    private int id;
-    private long timestamp;
+    private Integer id;
+    private Long timestamp;
     private UserDtoForPost user;
     private String title;
     private String announce;
-    private int likeCount;
-    private int dislikeCount;
-    private int commentCount;
-    private int viewCount;
+    private Integer likeCount;
+    private Integer dislikeCount;
+    private Integer commentCount;
+    private Integer viewCount;
 
     public void editAnnounceText(String text){
         text = Jsoup.parse(text).text();
-        int ANNOUNCE_TEXT_LIMIT = 149;
+        Integer ANNOUNCE_TEXT_LIMIT = 149;
         text = text.length() > ANNOUNCE_TEXT_LIMIT ? text.substring(0, ANNOUNCE_TEXT_LIMIT) : text;
         announce = text;
     }
@@ -28,19 +28,19 @@ public class PostDto {
         timestamp = Timestamp.valueOf(String.valueOf(time)).getTime() / 1000;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -68,35 +68,35 @@ public class PostDto {
         this.announce = announce;
     }
 
-    public int getLikeCount() {
+    public Integer getLikeCount() {
         return likeCount;
     }
 
-    public void setLikeCount(int likeCount) {
+    public void setLikeCount(Integer likeCount) {
         this.likeCount = likeCount;
     }
 
-    public int getDislikeCount() {
+    public Integer getDislikeCount() {
         return dislikeCount;
     }
 
-    public void setDislikeCount(int dislikeCount) {
+    public void setDislikeCount(Integer dislikeCount) {
         this.dislikeCount = dislikeCount;
     }
 
-    public int getCommentCount() {
+    public Integer getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(int commentCount) {
+    public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
     }
 
-    public int getViewCount() {
+    public Integer getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(int viewCount) {
+    public void setViewCount(Integer viewCount) {
         this.viewCount = viewCount;
     }
 }

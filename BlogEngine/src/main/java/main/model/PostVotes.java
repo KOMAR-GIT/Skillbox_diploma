@@ -9,7 +9,7 @@ public class PostVotes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "post_id")
@@ -23,16 +23,16 @@ public class PostVotes {
     private Date time;
 
     @Column(columnDefinition = "TINYINT", nullable = false)
-    private boolean value;
+    private Boolean value;
 
     public PostVotes() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -60,11 +60,11 @@ public class PostVotes {
         this.time = time;
     }
 
-    public boolean isValue() {
+    public Boolean isValue() {
         return value;
     }
 
-    public void setValue(boolean value) {
+    public void setValue(Boolean value) {
         this.value = value;
     }
 }

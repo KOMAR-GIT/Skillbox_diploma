@@ -9,10 +9,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Integer id;
 
     @Column(name = "is_moderator", columnDefinition = "TINYINT", nullable = false)
-    private boolean isModerator;
+    private Boolean isModerator;
 
     @Column(name = "reg_time", columnDefinition = "DATETIME", nullable = false)
     private Date regTime;
@@ -35,7 +35,7 @@ public class User {
     public User() {
     }
 
-    public User(int id, boolean isModerator, Date regTime, String name, String email, String password, String code, String photo) {
+    public User(Integer id, Boolean isModerator, Date regTime, String name, String email, String password, String code, String photo) {
         this.id = id;
         this.isModerator = isModerator;
         this.regTime = regTime;
@@ -46,11 +46,11 @@ public class User {
         this.photo = photo;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

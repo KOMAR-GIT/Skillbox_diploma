@@ -5,6 +5,7 @@ import main.model.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -35,7 +36,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
             "WHERE " +
             "   is_active = 1 " +
             "GROUP BY p.id " +
-            "ORDER BY ?1 ?2", nativeQuery = true)
-    Page<PostInterface> getPostsOrderBy(String sort , String mode, Pageable pageable);
+            "ORDER BY :sort", nativeQuery = true)
+    Page<PostInterface> getPostsOrderBy(@Param("sort") String sort, Pageable pageable);
 
 }

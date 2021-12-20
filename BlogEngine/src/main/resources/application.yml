@@ -7,9 +7,18 @@ spring:
   jpa:
     generate-ddl: true
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
-        ddl-auto: update
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      ddl-auto: none
+
+
+  flyway:
+    enabled: true
+    schemas: blogengine
+    baselineOnMigrate: true
+
+logging:
+  level:
+    sql: debug
 blog:
   title: DevPub
   subtitle: Рассказы разработчиков
