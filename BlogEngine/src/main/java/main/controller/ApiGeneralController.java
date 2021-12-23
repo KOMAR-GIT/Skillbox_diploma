@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +29,6 @@ public class ApiGeneralController {
 
     @Autowired
     ModelMapper modelMapper;
-
-    @Autowired
-    PostsService postsService;
 
     @Autowired
     TagsService tagsService;
@@ -54,19 +52,15 @@ public class ApiGeneralController {
     @GetMapping("/api/tag")
     private ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
         List<TagInterface> tagInterfaces = tagsService.getTags(query);
-        Integer maxTagsCount = tagInterfaces.stream().map(TagInterface::getTagCount).max(Comparator.comparing(Integer::intValue)).get();
         TagResponse tagResponse = new TagResponse(
-                tagInterfaces.stream().map(t -> convertTagToTagDTO(t,maxTagsCount)).collect(Collectors.toList()));
+                tagInterfaces.stream().map(this::convertTagToTagDTO).collect(Collectors.toList()));
 
         return new ResponseEntity<>(tagResponse, HttpStatus.OK);
     }
 
-    private TagDTO convertTagToTagDTO(TagInterface tagInterface, int maxCount) {
-        TagDTO tagDTO = new TagDTO();
-        tagDTO.setTag(tagInterface.getTag());
-        Double dWeightTag = (double) tagInterface.getTagCount() / postsService.getAllPostsCount();
-        Double tagWeight = dWeightTag * (1.0/ (double) maxCount / postsService.getAllPostsCount());
-        tagDTO.setWeight(tagWeight);
+    private TagDTO convertTagToTagDTO(TagInterface tagInterface) {
+        TagDTO tagDTO = modelMapper.map(tagInterface, TagDTO.class);
+        ;
         return tagDTO;
     }
 

@@ -3,6 +3,7 @@ package main.controller;
 import main.api.response.PostsResponse;
 import main.dto.PostDto;
 import main.dto.PostInterface;
+import main.dto.PostsDataForResponse;
 import main.dto.UserDtoForPost;
 import main.model.*;
 import main.repository.PostCommentRepository;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
 public class ApiPostController {
@@ -38,21 +40,12 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit,
             @RequestParam(value = "mode", defaultValue = "recent") PostOutputMode mode
     ) {
-        Page<PostInterface> posts = postsService.getPosts(offset, limit, mode);
+        List<PostDto> posts = postsService.getPosts(offset, limit, mode);
 
-        PostsResponse postsResponse = new PostsResponse((int) posts.getTotalElements(),
-                posts.stream().map(this::convertPostToDto).collect(Collectors.toList()));
+        posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
 
+        PostsResponse postsResponse = new PostsResponse(postsService.getAllPostsCount(), posts);
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
-    }
-
-    private PostDto convertPostToDto(PostInterface post) {
-        PostDto postDto = modelMapper.map(post, PostDto.class);
-        postDto.convertTimeToTimestamp(post.getTimestamp());
-        postDto.setUser(new UserDtoForPost(post.getUserId(), post.getName()));
-
-
-        return postDto;
     }
 
 

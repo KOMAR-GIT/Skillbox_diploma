@@ -1,49 +1,30 @@
 package main.service;
 
-import main.dto.PostInterface;
+import main.dto.PostDto;
+import main.repository.DAO.PostDAO;
 import main.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.List;
+
 
 @Service
 public class PostsService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+    private final PostDAO postDAO;
 
-
-
-    public PostsService() {
-
+    public PostsService(PostRepository postRepository, PostDAO postDAO) {
+        this.postRepository = postRepository;
+        this.postDAO = postDAO;
     }
 
-    public Page<PostInterface> getPosts(int offset, int limit, PostOutputMode mode) {
-        Page<PostInterface> posts;
-        switch (mode){
-            case early:
-                posts = postRepository.getPostsOrderBy("p.time desc", PageRequest.of(offset, limit));
-                break;
-            case best:
-            case popular:
-                posts = postRepository.getPostsOrderBy("commentCount", PageRequest.of(offset, limit));
-                break;
-            case recent:
-            default:
-                posts = postRepository.getPostsOrderBy("posts.time asc", PageRequest.of(offset, limit));
-                break;
-        }
-
-        System.out.println(posts.getContent().get(0).getId());
-        return posts;
+    public List<PostDto> getPosts(int offset, int limit, PostOutputMode mode) {
+        return postDAO.getPostsBySort(offset, limit, mode);
     }
 
-    public long getAllPostsCount(){
-        return postRepository.count();
+    public Integer getAllPostsCount() {
+        return postRepository.getPostsCount();
     }
-
-
-
 }

@@ -17,9 +17,24 @@ public class PostDto {
     private Integer commentCount;
     private Integer viewCount;
 
+    public PostDto() {
+    }
+
+    public PostDto(Integer id, Date timestamp, Integer userId, String name, String title, String announce, Integer likeCount, Integer dislikeCount, Integer commentCount, Integer viewCount) {
+        this.id = id;
+        this.timestamp = timestamp.getTime() / 1000;
+        user = new UserDtoForPost(userId,name);
+        this.title = title;
+        this.announce = announce;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
+        this.commentCount = commentCount;
+        this.viewCount = viewCount;
+    }
+
     public void editAnnounceText(String text){
         text = Jsoup.parse(text).text();
-        Integer ANNOUNCE_TEXT_LIMIT = 149;
+        int ANNOUNCE_TEXT_LIMIT = 149;
         text = text.length() > ANNOUNCE_TEXT_LIMIT ? text.substring(0, ANNOUNCE_TEXT_LIMIT) : text;
         announce = text;
     }

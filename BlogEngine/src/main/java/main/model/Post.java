@@ -1,10 +1,34 @@
 package main.model;
 
+import main.dto.PostDto;
+import org.hibernate.loader.custom.ConstructorResultColumnProcessor;
+
 import javax.persistence.*;
 import javax.xml.crypto.Data;
+import java.sql.Timestamp;
 import java.util.Date;
 
+
+
 @Entity(name = "posts")
+@SqlResultSetMapping(
+        name = "PostsMapping",
+        classes = @ConstructorResult(
+                targetClass = PostDto.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Integer.class),
+                        @ColumnResult(name = "timestamp", type = Date.class),
+                        @ColumnResult(name = "userId", type = Integer.class),
+                        @ColumnResult(name = "name", type = String.class),
+                        @ColumnResult(name = "title", type = String.class),
+                        @ColumnResult(name = "announce", type = String.class),
+                        @ColumnResult(name = "likeCount", type = Integer.class),
+                        @ColumnResult(name = "dislikeCount", type = Integer.class),
+                        @ColumnResult(name = "commentCount", type = Integer.class),
+                        @ColumnResult(name = "viewCount", type = Integer.class)
+                }
+        )
+)
 @Table
 public class Post {
 

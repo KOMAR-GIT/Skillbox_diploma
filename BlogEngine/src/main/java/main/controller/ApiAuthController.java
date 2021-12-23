@@ -25,8 +25,4 @@ public class ApiAuthController {
         return new ResponseEntity<>(authCheckService.getAuthCheck(), HttpStatus.OK);
     }
 
-//    private UserDTO convertUserToDTO(User user){
-//
-//    }
-
 }

@@ -1,10 +1,10 @@
 package main.service;
 
-import main.dto.TagDTO;
+import main.api.response.TagResponse;
 import main.dto.TagInterface;
 import main.repository.Tag2PostRepository;
+import main.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 public class TagsService {
 
     @Autowired
-    Tag2PostRepository tag2PostRepository;
+    TagRepository tagRepository;
 
     public TagsService() {
     }
@@ -21,9 +21,9 @@ public class TagsService {
     public List<TagInterface> getTags(String query){
         List<TagInterface> tagInterfaces;
         if(query.isEmpty()){
-            tagInterfaces = tag2PostRepository.getAllTags();
+            tagInterfaces = tagRepository.getAllTags();
         }else
-            tagInterfaces = tag2PostRepository.getTagsByQuery(query);
+            tagInterfaces = tagRepository.getTagsByQuery(query);
         return tagInterfaces;
     }
 
