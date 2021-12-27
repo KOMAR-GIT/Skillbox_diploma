@@ -14,9 +14,12 @@ public class PostDAO {
     @Autowired
     private EntityManager entityManager;
 
-    public List getPostsBySort(int offset, int limit, PostOutputMode mode) {
+    public List getPostsBySortAndSearch(int offset, int limit, PostOutputMode mode, String queryVal) {
+        String searchLine = "";
+        if (!queryVal.isEmpty()) {
+            searchLine = " and match(p.text, title) against(\"*" + queryVal + "*\" IN BOOLEAN MODE) ";
+        }
         String sortMode = "p.time";
-
         switch (mode) {
             case early:
                 sortMode = "p.time desc";
@@ -54,9 +57,10 @@ public class PostDAO {
                 "   moderation_status = 'ACCEPTED' " +
                 "and " +
                 "   p.time <= curdate() " +
+                    searchLine +
                 "GROUP BY p.id " +
-                "ORDER BY " + sortMode + " " +
-                "LIMIT :limit " +
+                "ORDER BY " + sortMode +
+                " LIMIT :limit " +
                 "OFFSET :offset ", "PostsMapping").setParameter("limit", limit).setParameter("offset", offset);
 
         return query.getResultList();

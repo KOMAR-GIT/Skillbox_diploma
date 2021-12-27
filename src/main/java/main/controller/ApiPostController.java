@@ -17,10 +17,9 @@ import java.util.List;
 public class ApiPostController {
 
 
-    private final  PostsService postsService;
+    private final PostsService postsService;
 
-
-    private final  ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     public ApiPostController(PostsService postsService, ModelMapper modelMapper) {
         this.postsService = postsService;
@@ -34,13 +33,20 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit,
             @RequestParam(value = "mode", defaultValue = "recent") PostOutputMode mode
     ) {
-        List<PostDto> posts = postsService.getPosts(offset, limit, mode);
-
+        List<PostDto> posts = postsService.getPosts(offset, limit, mode, "");
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-
-        PostsResponse postsResponse = new PostsResponse(postsService.getAllPostsCount(), posts);
-        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new PostsResponse(postsService.getAllPostsCount(), posts), HttpStatus.OK);
     }
 
+    @GetMapping("/api/post/search")
+    private ResponseEntity<PostsResponse> getPostsBySearch(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            @RequestParam(value = "query", defaultValue = "") String query
+    ){
+        List<PostDto> posts = postsService.getPosts(offset, limit, PostOutputMode.recent, query);
+        posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
+        return new ResponseEntity<>(new PostsResponse(postsService.getAllPostsCount(), posts), HttpStatus.OK);
+    }
 
 }
