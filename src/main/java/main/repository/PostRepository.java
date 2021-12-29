@@ -3,7 +3,10 @@ package main.repository;
 import main.model.Post;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface PostRepository extends PagingAndSortingRepository<Post, Integer> {
@@ -22,6 +25,13 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "and " +
             "   time <= curdate()" +
             "and" +
-            "   match(posts.text, title) against(?1)", nativeQuery = true)
-    Integer getQueriedPostsCount(String query); //Вернул 2 , но вывелся только 1 пост (последнее верно)
+            "   match(posts.text, title) against(:query)", nativeQuery = true)
+    Integer getQueriedPostsCount(@Param("query") String query);
+
+    @Query(value = "SELECT year(time) year FROM blogengine.posts group by year order by year;", nativeQuery = true)
+    List<Integer> getYears();
+
+
+
+
 }

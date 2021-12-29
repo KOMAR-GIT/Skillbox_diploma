@@ -20,6 +20,8 @@ public class PostDto {
     public PostDto() {
     }
 
+
+
     public PostDto(Integer id, Date timestamp, Integer userId, String name, String title, String announce, Integer likeCount, Integer dislikeCount, Integer commentCount, Integer viewCount) {
         this.id = id;
         this.timestamp = timestamp.getTime() / 1000;

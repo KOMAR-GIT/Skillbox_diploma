@@ -1,10 +1,12 @@
 package main.controller;
 
+import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
 import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.dto.TagDTO;
 import main.dto.TagInterface;
+import main.service.PostsService;
 import main.service.SettingsService;
 import main.service.TagsService;
 import org.modelmapper.ModelMapper;
@@ -21,17 +23,26 @@ import java.util.stream.Collectors;
 public class ApiGeneralController {
 
     private final SettingsService settingsService;
+
     private final InitResponse initResponse;
 
     private final ModelMapper modelMapper;
 
     private final TagsService tagsService;
 
-    public ApiGeneralController(SettingsService settingsService, InitResponse initResponse, ModelMapper modelMapper, TagsService tagsService) {
+    private final PostsService postsService;
+
+    public ApiGeneralController(SettingsService settingsService,
+                                InitResponse initResponse,
+                                ModelMapper modelMapper,
+                                TagsService tagsService,
+                                PostsService postsService)
+    {
         this.settingsService = settingsService;
         this.initResponse = initResponse;
         this.modelMapper = modelMapper;
         this.tagsService = tagsService;
+        this.postsService = postsService;
     }
 
 
@@ -53,6 +64,15 @@ public class ApiGeneralController {
 
         return new ResponseEntity<>(tagResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/api/calendar")
+    private ResponseEntity<CalendarResponse> calendar(@RequestParam(value = "year", defaultValue = "") String year){
+        CalendarResponse calendarResponse = new CalendarResponse(postsService.getYears() , postsService.getPostsCountByYear(year));
+        return new ResponseEntity<>(calendarResponse, HttpStatus.OK);
+    }
+
+
+
 
     private TagDTO convertTagToTagDTO(TagInterface tagInterface) {
         return modelMapper.map(tagInterface, TagDTO.class);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit,
             @RequestParam(value = "mode", defaultValue = "recent") PostOutputMode mode
     ) {
-        List<PostDto> posts = postsService.getPosts(offset, limit, mode, "");
+        List<PostDto> posts = postsService.getPosts(offset, limit, mode);
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
         return new ResponseEntity<>(new PostsResponse(postsService.getAllPostsCount(), posts), HttpStatus.OK);
     }
@@ -44,7 +45,18 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit,
             @RequestParam(value = "query", defaultValue = "") String query
     ){
-        List<PostDto> posts = postsService.getPosts(offset, limit, PostOutputMode.recent, query);
+        List<PostDto> posts = postsService.getPosts(offset, limit, query);
+        posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
+        return new ResponseEntity<>(new PostsResponse(postsService.getQueriedPostsCount(query), posts), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/post/byDate")
+    private ResponseEntity<PostsResponse> getPostsByDate(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            @RequestParam(value = "date", defaultValue = "") String date
+            ) {
+        List<PostDto> posts = postsService.getPosts(offset, limit, LocalDate.parse(date));
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
         return new ResponseEntity<>(new PostsResponse(postsService.getAllPostsCount(), posts), HttpStatus.OK);
     }

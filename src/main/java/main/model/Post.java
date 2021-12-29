@@ -1,15 +1,18 @@
 package main.model;
 
+import main.dto.CalendarDTO;
 import main.dto.PostDto;
+import main.repository.DAO.CalendarDao;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 
 
 @Entity(name = "posts")
 @SqlResultSetMapping(
-        name = "PostsMapping",
+        name = "PostsDtoMapping",
         classes = @ConstructorResult(
                 targetClass = PostDto.class,
                 columns = {
@@ -23,6 +26,16 @@ import java.util.Date;
                         @ColumnResult(name = "dislikeCount", type = Integer.class),
                         @ColumnResult(name = "commentCount", type = Integer.class),
                         @ColumnResult(name = "viewCount", type = Integer.class)
+                }
+        )
+)
+@SqlResultSetMapping(
+        name = "CalendarDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = CalendarDTO.class,
+                columns = {
+                        @ColumnResult(name = "date", type = LocalDate.class),
+                        @ColumnResult(name = "postsCount", type = Integer.class),
                 }
         )
 )

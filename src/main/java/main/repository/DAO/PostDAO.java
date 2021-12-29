@@ -6,19 +6,21 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
 public class PostDAO {
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    public List getPostsBySortAndSearch(int offset, int limit, PostOutputMode mode, String queryVal) {
-        String searchLine = "";
-        if (!queryVal.isEmpty()) {
-            searchLine = " and match(p.text, title) against(\"*" + queryVal + "*\" IN BOOLEAN MODE) ";
-        }
+    public PostDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+
+    public List getPosts(int offset, int limit, PostOutputMode mode, String queryVal, String date) {
+
         String sortMode = "p.time";
         switch (mode) {
             case early:
@@ -32,6 +34,13 @@ public class PostDAO {
                 break;
         }
 
+        String searchLine = "";
+        if (!queryVal.isEmpty()) {
+            searchLine = " and match(p.text, title) against(\"*" + queryVal + "*\" IN BOOLEAN MODE) ";
+        }
+
+        date = date.isEmpty() ? "" : " and date(p.time) = " + date;
+
         Query query = entityManager.createNativeQuery("SELECT " +
                 "   p.id," +
                 "   p.time as timestamp," +
@@ -43,7 +52,7 @@ public class PostDAO {
                 "   COUNT(pc.id) AS commentCount," +
                 "   sum(case when pv.value = true then 1 else 0 end) AS likeCount," +
                 "   sum(case when pv.value = false then 1 else 0 end) AS dislikeCount " +
-                "FROM" +
+                " FROM" +
                 "   blogengine.posts p " +
                 " LEFT JOIN " +
                 "   post_comments pc ON post_id = p.id " +
@@ -51,19 +60,22 @@ public class PostDAO {
                 "   users u ON p.user_id = u.id " +
                 " LEFT JOIN " +
                 "   post_votes pv ON p.id = pv.post_id " +
-                "WHERE " +
+                " WHERE " +
                 "   is_active = 1 " +
-                "and " +
+                " and " +
                 "   moderation_status = 'ACCEPTED' " +
-                "and " +
+                " and " +
                 "   p.time <= curdate() " +
                     searchLine +
-                "GROUP BY p.id " +
-                "ORDER BY " + sortMode +
+                    date +
+                " GROUP BY p.id " +
+                " ORDER BY " + sortMode +
                 " LIMIT :limit " +
-                "OFFSET :offset ", "PostsMapping").setParameter("limit", limit).setParameter("offset", offset);
+                " OFFSET :offset ", "PostsDtoMapping").setParameter("limit", limit).setParameter("offset", offset);
 
         return query.getResultList();
     }
+
+
 
 }
