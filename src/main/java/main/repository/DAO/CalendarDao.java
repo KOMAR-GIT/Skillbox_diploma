@@ -24,15 +24,18 @@ public class CalendarDao {
         Query query = entityManager.createNativeQuery(
                 "SELECT " +
                         "    DATE(time) AS date, COUNT(time) postsCount " +
-                        "FROM " +
+                        " FROM " +
                         "    blogengine.posts " +
-                        "WHERE " +
-                        "    YEAR(time) = YEAR(CURDATE()) " +
-                        "        AND is_active = 1 " +
-                        "        AND moderation_status = 'ACCEPTED' " +
-                        "        AND time <= CURDATE() " +
-                        "        AND YEAR(time) = :year " +
-                        "GROUP BY DATE(time);", "CalendarDtoMapping"
+                        " WHERE " +
+                        "    is_active = 1 " +
+                        " AND " +
+                        "    moderation_status = 'ACCEPTED' " +
+                        " AND " +
+                        "    time <= CURDATE() " +
+                        " AND " +
+                        "    YEAR(time) = :year " +
+                        "GROUP BY " +
+                        "    DATE(time);", "CalendarDtoMapping"
         ).setParameter("year", yearForQuery);
 
         return query.getResultList();

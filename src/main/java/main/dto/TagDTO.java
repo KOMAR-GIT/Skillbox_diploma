@@ -2,16 +2,16 @@ package main.dto;
 
 public class TagDTO {
 
-    private String tag;
+    private String name;
 
     private Double weight;
 
-    public String getTag() {
-        return tag;
+    public String getName() {
+        return name;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Double getWeight() {

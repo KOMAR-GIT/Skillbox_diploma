@@ -1,47 +1,44 @@
 package main.dto;
 
-import org.jsoup.Jsoup;
-
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
-public class PostDto {
+public class PostByIdDTO {
 
     private Integer id;
     private Long timestamp;
+    private boolean active;
     private UserDtoForPost user;
     private String title;
-    private String announce;
+    private String text;
     private Integer likeCount;
     private Integer dislikeCount;
-    private Integer commentCount;
     private Integer viewCount;
 
-    public PostDto() {
+    public PostByIdDTO() {
     }
 
 
-    public PostDto(Integer id, Date timestamp, Integer userId, String name, String title, String announce, Integer likeCount, Integer dislikeCount, Integer commentCount, Integer viewCount) {
+    public PostByIdDTO(Integer id,
+                       Date timestamp,
+                       Boolean active,
+                       Integer userId,
+                       String userName,
+                       String title,
+                       String text,
+                       Integer likeCount,
+                       Integer dislikeCount,
+                       Integer viewCount) {
         this.id = id;
-        this.timestamp = timestamp.getTime() / 1000;
-        user = new UserDtoForPost(userId,name);
+        this.timestamp = timestamp.getTime();
+        this.active = active;
+        user = new UserDtoForPost(userId, userName);
         this.title = title;
-        this.announce = announce;
+        this.text = text;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
-        this.commentCount = commentCount;
         this.viewCount = viewCount;
-    }
-
-    public void editAnnounceText(String text){
-        text = Jsoup.parse(text).text();
-        int ANNOUNCE_TEXT_LIMIT = 149;
-        text = text.length() > ANNOUNCE_TEXT_LIMIT ? text.substring(0, ANNOUNCE_TEXT_LIMIT) : text;
-        announce = text;
-    }
-
-    public void convertTimeToTimestamp(Date time){
-        timestamp = Timestamp.valueOf(String.valueOf(time)).getTime() / 1000;
     }
 
     public Integer getId() {
@@ -60,6 +57,14 @@ public class PostDto {
         this.timestamp = timestamp;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public UserDtoForPost getUser() {
         return user;
     }
@@ -76,12 +81,12 @@ public class PostDto {
         this.title = title;
     }
 
-    public String getAnnounce() {
-        return announce;
+    public String getText() {
+        return text;
     }
 
-    public void setAnnounce(String announce) {
-        this.announce = announce;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public Integer getLikeCount() {
@@ -98,14 +103,6 @@ public class PostDto {
 
     public void setDislikeCount(Integer dislikeCount) {
         this.dislikeCount = dislikeCount;
-    }
-
-    public Integer getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(Integer commentCount) {
-        this.commentCount = commentCount;
     }
 
     public Integer getViewCount() {

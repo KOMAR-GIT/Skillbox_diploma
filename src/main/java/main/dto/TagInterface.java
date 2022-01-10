@@ -2,6 +2,6 @@ package main.dto;
 
 public interface TagInterface {
 
-    String getTag();
+    String getName();
     Double getWeight();
 }

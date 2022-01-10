@@ -15,7 +15,7 @@ public class TagsService {
         this.tagRepository = tagRepository;
     }
 
-    public List<TagInterface> getTags(String query) {
+    public List<TagInterface> getTagsByQuery(String query) {
         List<TagInterface> tagInterfaces;
         if (query.isEmpty()) {
             tagInterfaces = tagRepository.getAllTags();
@@ -25,5 +25,8 @@ public class TagsService {
         return tagInterfaces;
     }
 
+    public List<String> getPostTags(int postId){
+        return tagRepository.getPostTags(postId);
+    }
 
 }

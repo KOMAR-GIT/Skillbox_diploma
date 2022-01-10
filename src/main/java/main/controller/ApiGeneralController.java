@@ -58,7 +58,7 @@ public class ApiGeneralController {
 
     @GetMapping("/api/tag")
     private ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
-        List<TagInterface> tagInterfaces = tagsService.getTags(query);
+        List<TagInterface> tagInterfaces = tagsService.getTagsByQuery(query);
         TagResponse tagResponse = new TagResponse(
                 tagInterfaces.stream().map(this::convertTagToTagDTO).collect(Collectors.toList()));
 
