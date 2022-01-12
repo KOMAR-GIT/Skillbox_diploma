@@ -1,7 +1,9 @@
 package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SettingsResponse {
 
     @JsonProperty("MULTIUSER_MODE")
@@ -10,6 +12,15 @@ public class SettingsResponse {
     private Boolean postPremoderation;
     @JsonProperty("STATISTICS_IS_PUBLIC")
     private Boolean statisticIsPublic;
+
+    public SettingsResponse(Boolean multiuserMode, Boolean postPremoderation, Boolean statisticIsPublic) {
+        this.multiuserMode = multiuserMode;
+        this.postPremoderation = postPremoderation;
+        this.statisticIsPublic = statisticIsPublic;
+    }
+
+    public SettingsResponse() {
+    }
 
     public Boolean isMultiuserMode() {
         return multiuserMode;

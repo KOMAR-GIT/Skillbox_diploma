@@ -3,6 +3,8 @@ package main.controller;
 import main.api.response.PostByIdResponse;
 import main.api.response.PostsResponse;
 import main.dto.*;
+import main.dto.interfaces.CommentInterface;
+import main.dto.interfaces.PostInterface;
 import main.service.PostCommentsService;
 import main.service.PostOutputMode;
 import main.service.PostsService;
@@ -82,23 +84,19 @@ public class ApiPostController {
         return new ResponseEntity<>(new PostsResponse(postsService.getPostsCountByTag(tag), posts), HttpStatus.OK);
     }
 
+    //Не реализовано увеличение количества просмотров
     @GetMapping("/api/post/{id}")
     private ResponseEntity<PostByIdResponse> getPostsById(@PathVariable Integer id) {
         PostInterface post = postsService.getPostById(id);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        PostByIdDTO postByIdDTO = convertPostCommentToPostCommentsDTO(post);
-        return new ResponseEntity<>(new PostByIdResponse(postByIdDTO, postCommentsService
+        return new ResponseEntity<>(new PostByIdResponse(post, postCommentsService
                 .getComments(id)
                 .stream()
                 .map(this::convertPostCommentToPostCommentsDTO)
                 .collect(Collectors.toList()),
                 tagsService.getPostTags(id)), HttpStatus.OK);
-    }
-
-    private PostByIdDTO convertPostCommentToPostCommentsDTO(PostInterface postInterface) {
-        return modelMapper.map(postInterface, PostByIdDTO.class);
     }
 
     private PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {

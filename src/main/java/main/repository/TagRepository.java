@@ -1,6 +1,6 @@
 package main.repository;
 
-import main.dto.TagInterface;
+import main.dto.interfaces.TagInterface;
 import main.model.Tag;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

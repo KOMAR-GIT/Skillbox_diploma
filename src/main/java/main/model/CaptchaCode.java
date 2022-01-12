@@ -23,6 +23,12 @@ public class CaptchaCode {
     public CaptchaCode() {
     }
 
+    public CaptchaCode(Date time, String code, String secretCode) {
+        this.time = time;
+        this.code = code;
+        this.secretCode = secretCode;
+    }
+
     public Integer getId() {
         return id;
     }

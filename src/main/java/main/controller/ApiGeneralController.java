@@ -5,7 +5,7 @@ import main.api.response.InitResponse;
 import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.dto.TagDTO;
-import main.dto.TagInterface;
+import main.dto.interfaces.TagInterface;
 import main.service.PostsService;
 import main.service.SettingsService;
 import main.service.TagsService;

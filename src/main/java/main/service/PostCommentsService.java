@@ -1,7 +1,6 @@
 package main.service;
 
-import main.dto.CommentInterface;
-import main.dto.PostCommentsDTO;
+import main.dto.interfaces.CommentInterface;
 import main.repository.PostCommentRepository;
 import org.springframework.stereotype.Service;
 

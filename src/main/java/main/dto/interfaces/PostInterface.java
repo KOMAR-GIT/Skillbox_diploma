@@ -1,8 +1,7 @@
-package main.dto;
+package main.dto.interfaces;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Date;
 
 public interface PostInterface {
 

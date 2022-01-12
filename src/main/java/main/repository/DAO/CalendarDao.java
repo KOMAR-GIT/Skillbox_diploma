@@ -11,7 +11,7 @@ import java.util.List;
 public class CalendarDao {
 
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public CalendarDao(EntityManager entityManager) {
         this.entityManager = entityManager;

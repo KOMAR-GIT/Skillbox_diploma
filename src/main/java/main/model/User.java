@@ -46,6 +46,16 @@ public class User {
         this.photo = photo;
     }
 
+    public User(Boolean isModerator, Date regTime, String name, String email, String password, String code, String photo) {
+        this.isModerator = isModerator;
+        this.regTime = regTime;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.code = code;
+        this.photo = photo;
+    }
+
     public Integer getId() {
         return id;
     }

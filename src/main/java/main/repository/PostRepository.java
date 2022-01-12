@@ -1,7 +1,6 @@
 package main.repository;
 
-import main.dto.PostByIdDTO;
-import main.dto.PostInterface;
+import main.dto.interfaces.PostInterface;
 import main.model.Post;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

@@ -1,8 +1,7 @@
 package main.service;
 
 import main.dto.CalendarDTO;
-import main.dto.PostByIdDTO;
-import main.dto.PostInterface;
+import main.dto.interfaces.PostInterface;
 import main.repository.DAO.CalendarDao;
 import main.repository.DAO.PostDAO;
 import main.repository.DAO.builder.PostQueryBuilder;

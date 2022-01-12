@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.TagInterface;
+import main.dto.interfaces.TagInterface;
 import main.repository.TagRepository;
 import org.springframework.stereotype.Service;
 

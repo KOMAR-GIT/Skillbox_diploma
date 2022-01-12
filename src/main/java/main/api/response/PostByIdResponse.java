@@ -1,10 +1,11 @@
 package main.api.response;
 
-import main.dto.PostByIdDTO;
 import main.dto.PostCommentsDTO;
+import main.dto.interfaces.PostInterface;
 import main.dto.UserDtoForPost;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -12,12 +13,12 @@ public class PostByIdResponse {
 
     private Integer id;
     private Long timestamp;
-    private boolean active;
+    private Byte active;
     private UserDtoForPost user;
     private String title;
     private String text;
-    private Integer likeCount;
-    private Integer dislikeCount;
+    private BigInteger likeCount;
+    private BigInteger dislikeCount;
     private Integer viewCount;
     private List<PostCommentsDTO> comments;
     private List<String> tags;
@@ -25,18 +26,18 @@ public class PostByIdResponse {
     public PostByIdResponse() {
     }
 
-    public PostByIdResponse(PostByIdDTO postByIdDTO,
+    public PostByIdResponse(PostInterface postInterface,
                             List<PostCommentsDTO> comments,
                             List<String> tags) {
-        this.id = postByIdDTO.getId();
-        this.timestamp = postByIdDTO.getTimestamp() / 1000;
-        this.active = postByIdDTO.isActive();
-        this.user = postByIdDTO.getUser();
-        this.title = postByIdDTO.getTitle();
-        this.text = postByIdDTO.getText();
-        this.likeCount = postByIdDTO.getLikeCount();
-        this.dislikeCount = postByIdDTO.getDislikeCount();
-        this.viewCount = postByIdDTO.getViewCount();
+        this.id = postInterface.getId();
+        this.timestamp = postInterface.getTimestamp().getTime() / 1000;
+        this.active = postInterface.getActive();
+        this.user = new UserDtoForPost(postInterface.getUserId(), postInterface.getUserName());
+        this.title = postInterface.getTitle();
+        this.text = postInterface.getText();
+        this.likeCount = postInterface.getLikeCount();
+        this.dislikeCount = postInterface.getDislikeCount();
+        this.viewCount = postInterface.getViewCount();
         this.comments = comments;
         this.tags = tags;
     }
@@ -57,11 +58,11 @@ public class PostByIdResponse {
         this.timestamp = timestamp;
     }
 
-    public boolean isActive() {
+    public Byte isActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Byte active) {
         this.active = active;
     }
 
@@ -89,19 +90,19 @@ public class PostByIdResponse {
         this.text = text;
     }
 
-    public Integer getLikeCount() {
+    public BigInteger getLikeCount() {
         return likeCount;
     }
 
-    public void setLikeCount(Integer likeCount) {
+    public void setLikeCount(BigInteger likeCount) {
         this.likeCount = likeCount;
     }
 
-    public Integer getDislikeCount() {
+    public BigInteger getDislikeCount() {
         return dislikeCount;
     }
 
-    public void setDislikeCount(Integer dislikeCount) {
+    public void setDislikeCount(BigInteger dislikeCount) {
         this.dislikeCount = dislikeCount;
     }
 

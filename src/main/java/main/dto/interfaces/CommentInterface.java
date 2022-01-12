@@ -1,4 +1,4 @@
-package main.dto;
+package main.dto.interfaces;
 
 import java.util.Date;
 

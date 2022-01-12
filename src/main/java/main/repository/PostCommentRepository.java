@@ -1,7 +1,6 @@
 package main.repository;
 
-import main.dto.CommentInterface;
-import main.dto.PostCommentsDTO;
+import main.dto.interfaces.CommentInterface;
 import main.model.PostComment;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
