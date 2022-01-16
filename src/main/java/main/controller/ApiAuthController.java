@@ -28,6 +28,7 @@ public class ApiAuthController {
         return new ResponseEntity<>(authCheckService.getAuthCheck(), HttpStatus.OK);
     }
 
+
     @GetMapping("/api/auth/captcha")
     public ResponseEntity<CaptchaResponse> captcha(){
         return new ResponseEntity<>(authCheckService.generateCaptchaCodes(), HttpStatus.OK);

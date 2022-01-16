@@ -27,6 +27,9 @@ public class PostsService {
         this.calendarDao = calendarDao;
     }
 
+    public List getPostsForModeration(int offset, int limit){
+        return postDAO.getPostsForModeration(new PostQueryBuilder(offset, limit));
+    }
 
     public List getPostsByMode(int offset, int limit, PostOutputMode mode) {
         String sortMode;
@@ -88,6 +91,10 @@ public class PostsService {
         return postRepository.getPostsCount();
     }
 
+    public Integer getPostsForModerationCount() {
+        return postRepository.getPostsForModerationCount();
+    }
+
     public Integer getPostsCount(String searchQuery) {
         return postRepository.getQueriedPostsCount(searchQuery);
     }
@@ -103,7 +110,7 @@ public class PostsService {
 
     public Map<LocalDate, Integer> getPostsCountByYear(String year) {
         List<CalendarDTO> posts = calendarDao.getPostsCountByYear(String.valueOf(year));
-        return posts.stream().collect(Collectors.toMap(t -> t.getDate(), CalendarDTO::getCount));
+        return posts.stream().collect(Collectors.toMap(CalendarDTO::getDate, CalendarDTO::getCount));
     }
 
     public List<Integer> getYears() {

@@ -30,15 +30,12 @@ public class PostQueryBuilder {
             " LEFT JOIN " +
             "   post_votes pv ON p.id = pv.post_id " +
             " WHERE " +
-            "   is_active = 1 " +
-            " and " +
-            "   moderation_status = 'ACCEPTED' " +
-            " and " +
-            "   p.time <= curdate() ";
+            "   is_active = 1 ";
 
     private final static String groupQuery = " GROUP BY p.id ";
     private final static String limitQuery = " LIMIT :limit ";
     private final static String offsetQuery = " OFFSET :offset ";
+    private final static String generalFilterQuery = " and moderation_status = 'ACCEPTED' and p.time <= curdate() ";
 
     private final List<String> filter = new ArrayList<>();
     private final List<String> order = new ArrayList<>();
@@ -64,8 +61,9 @@ public class PostQueryBuilder {
         return this;
     }
 
-    public Query build(EntityManager entityManager) {
+    public Query build(EntityManager entityManager, boolean isPostsForModeration) {
         Query query = entityManager.createNativeQuery(generalQuery
+                + (isPostsForModeration ? "" : generalFilterQuery)
                 + (filter.isEmpty() ? "" : " and ")
                 + String.join(" and ", filter)
                 + groupQuery

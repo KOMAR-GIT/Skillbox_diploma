@@ -26,3 +26,5 @@ blog:
   email: mail@mail.ru
   copyright: Комаров Богдан
   copyrightFrom: 2021
+captcha:
+  lifetimeInMinutes: 3600

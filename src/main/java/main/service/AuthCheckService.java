@@ -10,25 +10,30 @@ import main.model.CaptchaCode;
 import main.model.User;
 import main.repository.CaptchaCodeRepository;
 import main.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import java.util.*;
 
 @Service
 public class AuthCheckService {
 
+    @Value("${captcha.lifetimeInMinutes}")
+    private int captchaLifetime;
     private final CaptchaCodeRepository captchaCodeRepository;
     private final UserRepository userRepository;
 
     public AuthCheckService(CaptchaCodeRepository captchaCodeRepository, UserRepository userRepository) {
         this.captchaCodeRepository = captchaCodeRepository;
         this.userRepository = userRepository;
+    }
+
+    @Scheduled(fixedDelay = 7_200_000)
+    public void deleteOldCaptcha() {
+        captchaCodeRepository.deleteOldCaptcha(captchaLifetime);
     }
 
     public AuthCheckResponse getAuthCheck() {
@@ -40,7 +45,7 @@ public class AuthCheckService {
         String token = cage.getTokenGenerator().next();
         String encodedString = "data:image/png;base64, " + Base64.getEncoder().encodeToString(cage.draw(token));
         String secret = UUID.randomUUID().toString();
-        captchaCodeRepository.save(new CaptchaCode(Date.valueOf(LocalDate.now()), token, secret));
+        captchaCodeRepository.save(new CaptchaCode(Calendar.getInstance().getTime(), token, secret));
         return new CaptchaResponse(secret, encodedString);
     }
 
@@ -50,13 +55,10 @@ public class AuthCheckService {
 
     public Map<String, String> addNewUser(UserForRegistrationDTO userDTO) {
         Map<String, String> errors = new HashMap<>();
-        System.out.println(userDTO.getName());
-        errors = isEmailValid(userDTO.getEmail(), errors);
-        errors = isNameCorrect(userDTO.getName(), errors);
-        errors = isPasswordCorrect(userDTO.getPassword(), errors);
-        if (!checkCaptcha(userDTO.getCaptchaSecret())) {
-            errors.put("captcha", ErrorsForRegistration.captcha);
-        }
+        isEmailValid(userDTO.getEmail(), errors);
+        isNameCorrect(userDTO.getName(), errors);
+        isPasswordCorrect(userDTO.getPassword(), errors);
+        isCaptchaCorrect(userDTO.getCaptchaSecret(), errors);
 
         if (errors.isEmpty()) {
             User user = new User(false,
@@ -73,28 +75,27 @@ public class AuthCheckService {
     }
 
 
-    private Map<String, String> isEmailValid(String email, Map<String, String> map) {
-        if (userRepository.getByEmail(email) == null) {
-            return map;
+    private void isEmailValid(String email, Map<String, String> map) {
+        if (userRepository.getByEmail(email) != null) {
+            map.put("email", ErrorsForRegistration.email);
         }
-        map.put("email", ErrorsForRegistration.email);
-        return map;
     }
 
-    private Map<String, String> isNameCorrect(String name, Map<String, String> map) {
-        if (name.chars().allMatch(Character::isLetter)) {
-            return map;
+    private void isNameCorrect(String name, Map<String, String> map) {
+        if (!name.chars().allMatch(Character::isLetter)) {
+            map.put("name", ErrorsForRegistration.name);
         }
-        map.put("name", ErrorsForRegistration.name);
-        return map;
     }
 
-    private Map<String, String> isPasswordCorrect(String password, Map<String, String> map) {
-        if (password.length() >= 6) {
-            return map;
+    private void isPasswordCorrect(String password, Map<String, String> map) {
+        if (password.length() < 6) {
+            map.put("password", ErrorsForRegistration.password);
         }
-        map.put("password", ErrorsForRegistration.password);
-        return map;
     }
 
+    private void isCaptchaCorrect(String secret, Map<String, String> map) {
+        if (!checkCaptcha(secret)) {
+            map.put("captcha", ErrorsForRegistration.captcha);
+        }
+    }
 }

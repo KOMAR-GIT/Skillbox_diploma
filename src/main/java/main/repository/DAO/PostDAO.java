@@ -20,10 +20,16 @@ public class PostDAO {
 
     public List getPosts(PostQueryBuilder postQueryBuilder) {
 
-        Query query = postQueryBuilder.build(entityManager);
+        Query query = postQueryBuilder.build(entityManager, false);
 
         return query.getResultList();
     }
 
+    public List getPostsForModeration(PostQueryBuilder postQueryBuilder) {
+
+        Query query = postQueryBuilder.build(entityManager, true);
+
+        return query.getResultList();
+    }
 
 }

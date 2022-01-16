@@ -99,6 +99,16 @@ public class ApiPostController {
                 tagsService.getPostTags(id)), HttpStatus.OK);
     }
 
+    @GetMapping("/api/post/moderation")
+    private ResponseEntity<PostsResponse> getPostsForModeration(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        List<PostDto> posts = postsService.getPostsForModeration(offset, limit);
+        posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
+        return new ResponseEntity<>(new PostsResponse(postsService.getPostsForModerationCount(), posts), HttpStatus.OK);
+    }
+
+
     private PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
         PostCommentsDTO postCommentsDTO = modelMapper.map(commentInterface, PostCommentsDTO.class);
         postCommentsDTO.setTimestamp(postCommentsDTO.getTimestamp() / 1000);

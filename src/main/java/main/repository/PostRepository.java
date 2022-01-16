@@ -17,12 +17,11 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             " FROM " +
             "   posts p" +
             " where " +
-            "   is_active = 1 " +
-            " and " +
+            "   is_active = 1 ";
+    String filterQuery = " and " +
             "   moderation_status = 'ACCEPTED'" +
             " and " +
             "   time <= curdate()";
-
 
     @Query(value = "SELECT " +
             "   p.id as id," +
@@ -54,16 +53,20 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     PostInterface getPostById(@Param("id") int id);
 
 
-
-    @Query(value = countQuery, nativeQuery = true)
+    @Query(value = countQuery + filterQuery, nativeQuery = true)
     Integer getPostsCount();
 
-    @Query(value = countQuery +
-            " and match(p.text, title) against(:query)", nativeQuery = true)
+    @Query(value = countQuery, nativeQuery = true)
+    Integer getPostsForModerationCount();
+
+    @Query(value = countQuery
+            + filterQuery
+            + " and match(p.text, title) against(:query)", nativeQuery = true)
     Integer getQueriedPostsCount(@Param("query") String query);
 
-    @Query(value = countQuery +
-            " and DATE(p.time) = :date", nativeQuery = true)
+    @Query(value = countQuery
+            + filterQuery
+            + " and DATE(p.time) = :date", nativeQuery = true)
     Integer getPostsCountByDate(@Param("date") String date);
 
     @Query(value = "SELECT " +
@@ -73,13 +76,14 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "    join tag2post tp on p.id = post_id" +
             " WHERE" +
             "    p.id in (select post_id from tag2post join tags t on tag_id = t.id where t.name = :tag)" +
+            " AND" +
+            "    p.is_active = 1 "
+            + filterQuery +
             " GROUP BY tp.tag_id", nativeQuery = true)
     Integer getPostsCountByTag(@Param("tag") String tag);
 
     @Query(value = "SELECT year(time) year FROM blogengine.posts group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
-
-
 
 
 }
