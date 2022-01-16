@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/blogengine?serverTimezone=UTC
+    username: root
+    password: rootroot
+
+  jpa:
+    generate-ddl: true
+    properties:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      ddl-auto: none
+
+
+  flyway:
+    enabled: true
+    schemas: blogengine
+    baselineOnMigrate: true
+
+logging:
+  level:
+    sql: debug
+blog:
+  title: DevPub
+  subtitle: Рассказы разработчиков
+  phone: +7 903 666-44-55
+  email: mail@mail.ru
+  copyright: Комаров Богдан
+  copyrightFrom: 2021
+captcha:
+  lifetimeInMinutes: 3600
