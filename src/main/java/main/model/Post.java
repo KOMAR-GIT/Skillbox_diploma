@@ -2,7 +2,7 @@ package main.model;
 
 import main.dto.CalendarDTO;
 import main.dto.PostDto;
-import main.repository.DAO.CalendarDao;
+import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

@@ -82,7 +82,11 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             " GROUP BY tp.tag_id", nativeQuery = true)
     Integer getPostsCountByTag(@Param("tag") String tag);
 
-    @Query(value = "SELECT year(time) year FROM blogengine.posts group by year order by year;", nativeQuery = true)
+    @Query(value = "SELECT year(time) year FROM blogengine.posts " +
+            "WHERE is_active = 1 " +
+            "   and moderation_status = 'ACCEPTED' " +
+            "   and time <= curdate() " +
+            "group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
 
 

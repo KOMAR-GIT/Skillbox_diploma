@@ -1,9 +1,9 @@
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (1, '111', '1@gmail.com', 1 ,  'John Kar', 'yaJohn','photo', '2020-6-24 00:00:00');
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (2, '222', '1@gmail.com', 0 ,  'David Young', 'yaDavid','photo', '2019-6-24 00:00:00');
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (3, '333', '1@gmail.com', 0 ,  'Roger Perry', 'yaRoger','photo', '2018-6-24 00:00:00');
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (4, '444', '1@gmail.com', 1 ,  'John Fields', 'yaJohn','photo', '2017-6-24 00:00:00');
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (5, '555', '1@gmail.com', 0 ,  'Karen Murray', 'yaKaren','photo', '2016-6-24 00:00:00');
-insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (6, '666', '1@gmail.com', 1 ,  'Jeanette Gomez', 'yaJeanette','photo', '2015-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (1, '111', '1@gmail.com', 1 ,  'John Kar', '$2a$12$rfUJ.3R08bY.FZUa3cMyDucxv6T7/W7U10HPy9ipn77Ey8woiU3F6','photo', '2020-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (2, '222', '2@gmail.com', 0 ,  'David Young', '$2a$12$LqGeqi0jWlmbfYp2hsvAhOqkWCz6BdtFycB4jwY1bnfAoaSOSnK1i','photo', '2019-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (3, '333', '3@gmail.com', 0 ,  'Roger Perry', '$2a$12$uWguD18VRxsR6swSQIUnjOuXJj7UPdthRGBD5BanalmMG884W7bbC','photo', '2018-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (4, '444', '4@gmail.com', 1 ,  'John Fields', '$2a$12$Q95vOmXcCn1KQRqchkPbceYnu0oxG63oCzklYZ4sEFp1rDKfuqGQK','photo', '2017-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (5, '555', '5@gmail.com', 0 ,  'Karen Murray', '$2a$12$3Ba3ADTVMUacTl75C3i87.dQt.Qpob2YLezfqNmhVjeuPsHTUUcT2','photo', '2016-6-24 00:00:00');
+insert into users (id, code, email, is_moderator, name, password, photo, reg_time) values (6, '666', '6@gmail.com', 1 ,  'Jeanette Gomez', '$2a$12$5Ju.V/aWthb1cT6ljcFxfe1yzJNSZJ0Ufp1WTYk3KB9mkPUqjQujG','photo', '2015-6-24 00:00:00');
 
 insert into posts (id, is_active, moderation_status, text, time, title, view_count, moderator_id, user_id)
     values(1, 1, 'ACCEPTED',
@@ -85,3 +85,6 @@ insert into tag2post(id, post_id, tag_id) values (2, 2, 2);
 insert into tag2post(id, post_id, tag_id) values (3, 3, 1);
 insert into tag2post(id, post_id, tag_id) values (4, 4, 3);
 insert into tag2post(id, post_id, tag_id) values (5, 5, 3);
+
+ALTER TABLE `blogengine`.`posts`
+ADD FULLTEXT INDEX `fulltext_search_index` (`title`, `text`) VISIBLE;

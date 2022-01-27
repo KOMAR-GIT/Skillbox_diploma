@@ -1,5 +1,7 @@
 package main.model;
 
+import main.model.enums.Role;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -8,7 +10,7 @@ import java.util.Date;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "is_moderator", columnDefinition = "TINYINT", nullable = false)
@@ -118,5 +120,9 @@ public class User {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Role getRole(){
+        return isModerator ? Role.MODERATOR : Role.USER;
     }
 }

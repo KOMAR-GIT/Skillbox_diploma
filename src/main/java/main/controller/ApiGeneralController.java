@@ -6,6 +6,7 @@ import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.dto.TagDTO;
 import main.dto.interfaces.TagInterface;
+import main.service.CalendarService;
 import main.service.PostsService;
 import main.service.SettingsService;
 import main.service.TagsService;
@@ -32,32 +33,35 @@ public class ApiGeneralController {
 
     private final PostsService postsService;
 
+    private final CalendarService calendarService;
+
     public ApiGeneralController(SettingsService settingsService,
                                 InitResponse initResponse,
                                 ModelMapper modelMapper,
                                 TagsService tagsService,
-                                PostsService postsService)
+                                PostsService postsService, CalendarService calendarService)
     {
         this.settingsService = settingsService;
         this.initResponse = initResponse;
         this.modelMapper = modelMapper;
         this.tagsService = tagsService;
         this.postsService = postsService;
+        this.calendarService = calendarService;
     }
 
 
     @GetMapping("/api/settings")
-    private SettingsResponse settings() {
+    public SettingsResponse settings() {
         return settingsService.getGlobalSettings();
     }
 
     @GetMapping("/api/init")
-    private InitResponse init() {
+    public InitResponse init() {
         return initResponse;
     }
 
     @GetMapping("/api/tag")
-    private ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
+    public ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
         List<TagInterface> tagInterfaces = tagsService.getTagsByQuery(query);
         TagResponse tagResponse = new TagResponse(
                 tagInterfaces.stream().map(this::convertTagToTagDTO).collect(Collectors.toList()));
@@ -66,8 +70,8 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/api/calendar")
-    private ResponseEntity<CalendarResponse> calendar(@RequestParam(value = "year", defaultValue = "") String year){
-        CalendarResponse calendarResponse = new CalendarResponse(postsService.getYears() , postsService.getPostsCountByYear(year));
+    public ResponseEntity<CalendarResponse> calendar(@RequestParam(value = "year", defaultValue = "") String year){
+        CalendarResponse calendarResponse = new CalendarResponse(calendarService.getYears() , calendarService.getPostsCountByYear(year));
         return new ResponseEntity<>(calendarResponse, HttpStatus.OK);
     }
 

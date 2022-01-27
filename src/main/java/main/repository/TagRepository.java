@@ -32,29 +32,50 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             " WHERE post_id = :postId", nativeQuery = true)
     List<String> getPostTags(@Param("postId") int postId);
 
-    @Query(value = "WITH total_post_count AS (SELECT count(*) FROM posts)," +
-            "most_popular_tag_count AS " +
-            "   (SELECT " +
-            "       count(t.id) AS postCount " +
-            "   FROM tag2post " +
-            "   JOIN tags t ON t.id = tag_id " +
-            "   GROUP BY t.id " +
-            "   order by postCount " +
-            "   limit 1) " +
-            "SELECT " +
-            "   t.name AS name, " +
-            "   (COUNT(t.id) / (SELECT " +
-            "            *" +
-            "        FROM" +
-            "            total_post_count)) * (1 / ((SELECT " +
-            "            * " +
+    @Query(value = "WITH " +
+            "   total_post_count " +
+            "   AS " +
+            "       (SELECT " +
+            "           count(*) " +
+            "       FROM " +
+            "           posts p " +
+            "       where " +
+            "           is_active = 1  " +
+            "       and " +
+            "           moderation_status = 'ACCEPTED'  " +
+            "       and " +
+            "           p.time <= curdate()), " +
+            "    weights" +
+            "    AS" +
+            "       (SELECT " +
+            "           tag_id," +
+            "           t.name as name, " +
+            "           (count(tp.tag_id) / " +
+            "               (SELECT " +
+            "                   * " +
+            "                FROM " +
+            "                   total_post_count)) weight " +
             "        FROM " +
-            "            most_popular_tag_count) / (SELECT " +
-            "            * " +
-            "        FROM " +
-            "            total_post_count))) AS weight " +
-            "FROM tag2post JOIN tags t ON t.id = tag_id" +
-            " GROUP BY t.id;", nativeQuery = true)
+            "           tag2post tp " +
+            "           JOIN tags t on tp.tag_id = t.id " +
+            "           JOIN posts p on tp.post_id = p.id " +
+            "        WHERE p.is_active = 1 " +
+            "           AND p.moderation_status = 'ACCEPTED' " +
+            "           AND p.time <= CURDATE() " +
+            "        GROUP BY tp.tag_id)" +
+            " SELECT " +
+            "   name," +
+            "   (weight * " +
+            "       (1 / " +
+            "           (SELECT " +
+            "               weight " +
+            "            FROM " +
+            "               weights " +
+            "            order by " +
+            "               weight desc " +
+            "            limit 1))) " +
+            " FROM " +
+            "   weights", nativeQuery = true)
     List<TagInterface> getAllTags();
 
 }

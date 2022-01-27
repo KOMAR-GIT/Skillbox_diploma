@@ -1,17 +1,17 @@
 package main.service;
 
-import main.dto.CalendarDTO;
 import main.dto.interfaces.PostInterface;
-import main.repository.DAO.CalendarDao;
+import main.model.enums.PostStatus;
 import main.repository.DAO.PostDAO;
 import main.repository.DAO.builder.PostQueryBuilder;
 import main.repository.PostRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -19,16 +19,14 @@ public class PostsService {
 
     private final PostRepository postRepository;
     private final PostDAO postDAO;
-    private final CalendarDao calendarDao;
 
-    public PostsService(PostRepository postRepository, PostDAO postDAO, CalendarDao calendarDao) {
+    public PostsService(PostRepository postRepository, PostDAO postDAO) {
         this.postRepository = postRepository;
         this.postDAO = postDAO;
-        this.calendarDao = calendarDao;
     }
 
     public List getPostsForModeration(int offset, int limit){
-        return postDAO.getPostsForModeration(new PostQueryBuilder(offset, limit));
+        return postDAO.getPostsForModerationOrUserPosts(new PostQueryBuilder(offset, limit));
     }
 
     public List getPostsByMode(int offset, int limit, PostOutputMode mode) {
@@ -81,6 +79,27 @@ public class PostsService {
         return postDAO.getPosts(postQueryBuilder);
     }
 
+    public List getUserPosts(int offset, int limit, PostStatus status, Principal principal) {
+        PostQueryBuilder postQueryBuilder = new PostQueryBuilder(offset, limit);
+        switch (status){
+            case inactive:
+                postQueryBuilder.where(" p.is_active = 0 ");
+                break;
+            case pending:
+                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'NEW' ");
+                break;
+            case declined:
+                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'DECLINED' ");
+                break;
+            case published:
+                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'ACCEPTED' ");
+                break;
+        }
+        postQueryBuilder.where(" u.email = '" +  principal.getName() + "'");
+        return postDAO.getPostsForModerationOrUserPosts(postQueryBuilder);
+    }
+
+
     public PostInterface getPostById(int id) {
         return postRepository.getPostById(id);
     }
@@ -108,14 +127,7 @@ public class PostsService {
     }
 
 
-    public Map<LocalDate, Integer> getPostsCountByYear(String year) {
-        List<CalendarDTO> posts = calendarDao.getPostsCountByYear(String.valueOf(year));
-        return posts.stream().collect(Collectors.toMap(CalendarDTO::getDate, CalendarDTO::getCount));
-    }
 
-    public List<Integer> getYears() {
-        return postRepository.getYears();
-    }
 
 
 }

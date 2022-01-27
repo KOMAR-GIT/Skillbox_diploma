@@ -19,6 +19,7 @@ spring:
 logging:
   level:
     sql: debug
+
 blog:
   title: DevPub
   subtitle: Рассказы разработчиков
