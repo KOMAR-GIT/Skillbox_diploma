@@ -2,10 +2,12 @@ package main.repository;
 
 import main.dto.interfaces.PostInterface;
 import main.model.Post;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -52,12 +54,19 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "   p.id", nativeQuery = true)
     PostInterface getPostById(@Param("id") int id);
 
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE blogengine.posts SET view_count = view_count + 1 WHERE (id = :post_id);", nativeQuery = true)
+    void increasePostViewsCount(@Param("post_id") int postId);
 
     @Query(value = countQuery + filterQuery, nativeQuery = true)
     Integer getPostsCount();
 
     @Query(value = countQuery, nativeQuery = true)
     Integer getPostsForModerationCount();
+
+    @Query(value = "SELECT COUNT(*) FROM posts p where :where ", nativeQuery = true)
+    Integer getUserPostsCount(@Param("where") String where);
 
     @Query(value = countQuery
             + filterQuery
@@ -82,8 +91,13 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             " GROUP BY tp.tag_id", nativeQuery = true)
     Integer getPostsCountByTag(@Param("tag") String tag);
 
-    @Query(value = "SELECT year(time) year FROM blogengine.posts group by year order by year;", nativeQuery = true)
+    @Query(value = "SELECT year(time) year FROM blogengine.posts " +
+            "WHERE is_active = 1 " +
+            "   and moderation_status = 'ACCEPTED' " +
+            "   and time <= curdate() " +
+            "group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
+
 
 
 }

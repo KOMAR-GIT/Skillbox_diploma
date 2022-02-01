@@ -5,4 +5,4 @@ create table post_votes (id integer not null, time DATETIME not null, value TINY
 create table posts (id integer not null, is_active tinyint not null, moderation_status enum('NEW', 'ACCEPTED', 'DECLINED') not null, text TEXT not null, time datetime not null, title VARCHAR(255) not null, view_count integer not null, moderator_id integer, user_id integer, primary key (id));
 create table tag2post (id integer not null, post_id integer not null, tag_id integer not null, primary key (id));
 create table tags (id integer not null, name VARCHAR(255), primary key (id));
-create table users (id integer not null, code VARCHAR(255), email VARCHAR(255) not null, is_moderator TINYINT not null, name VARCHAR(255) not null, password VARCHAR(255) not null, photo TEXT, reg_time DATETIME not null, primary key (id));
+create table users (id integer not null AUTO_INCREMENT, code VARCHAR(255), email VARCHAR(255) not null, is_moderator TINYINT not null, name VARCHAR(255) not null, password VARCHAR(255) not null, photo TEXT, reg_time DATETIME not null, primary key (id));

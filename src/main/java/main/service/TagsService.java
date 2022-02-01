@@ -22,6 +22,7 @@ public class TagsService {
         } else {
             tagInterfaces = tagRepository.getTagsByQuery(query);
         }
+
         return tagInterfaces;
     }
 

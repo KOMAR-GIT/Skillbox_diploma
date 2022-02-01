@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class DefaultController {
 
-    private final TagRepository tagRepository;
 
     public DefaultController(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
+
     }
 
     @RequestMapping("/")

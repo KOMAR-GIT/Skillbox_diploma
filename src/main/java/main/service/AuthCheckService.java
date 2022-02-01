@@ -12,10 +12,9 @@ import main.repository.CaptchaCodeRepository;
 import main.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -26,9 +25,14 @@ public class AuthCheckService {
     private final CaptchaCodeRepository captchaCodeRepository;
     private final UserRepository userRepository;
 
-    public AuthCheckService(CaptchaCodeRepository captchaCodeRepository, UserRepository userRepository) {
+
+    private final PasswordEncoder passwordEncoder;
+
+
+    public AuthCheckService(CaptchaCodeRepository captchaCodeRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.captchaCodeRepository = captchaCodeRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Scheduled(fixedDelay = 7_200_000)
@@ -36,9 +40,9 @@ public class AuthCheckService {
         captchaCodeRepository.deleteOldCaptcha(captchaLifetime);
     }
 
-    public AuthCheckResponse getAuthCheck() {
-        return new AuthCheckResponse(false);
-    }
+//    public AuthCheckResponse getAuthCheck() {
+//        return new AuthCheckResponse(false);
+//    }
 
     public CaptchaResponse generateCaptchaCodes() {
         Cage cage = new GCage();
@@ -62,10 +66,10 @@ public class AuthCheckService {
 
         if (errors.isEmpty()) {
             User user = new User(false,
-                    Date.valueOf(LocalDate.now()),
+                    Calendar.getInstance().getTime(),
                     userDTO.getName(),
                     userDTO.getEmail(),
-                    userDTO.getPassword(),
+                    passwordEncoder.encode(userDTO.getPassword()),
                     userDTO.getCaptcha(),
                     null);
             userRepository.save(user);

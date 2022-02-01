@@ -1,17 +1,20 @@
 package main.service;
 
-import main.dto.CalendarDTO;
+import main.api.response.PostsResponse;
 import main.dto.interfaces.PostInterface;
-import main.repository.DAO.CalendarDao;
+import main.model.enums.PostStatus;
+import main.model.enums.Role;
 import main.repository.DAO.PostDAO;
 import main.repository.DAO.builder.PostQueryBuilder;
 import main.repository.PostRepository;
+import main.security.SecurityUser;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -19,16 +22,14 @@ public class PostsService {
 
     private final PostRepository postRepository;
     private final PostDAO postDAO;
-    private final CalendarDao calendarDao;
 
-    public PostsService(PostRepository postRepository, PostDAO postDAO, CalendarDao calendarDao) {
+    public PostsService(PostRepository postRepository, PostDAO postDAO) {
         this.postRepository = postRepository;
         this.postDAO = postDAO;
-        this.calendarDao = calendarDao;
     }
 
-    public List getPostsForModeration(int offset, int limit){
-        return postDAO.getPostsForModeration(new PostQueryBuilder(offset, limit));
+    public List getPostsForModeration(int offset, int limit) {
+        return postDAO.getPostsForModerationOrUserPosts(new PostQueryBuilder(offset, limit));
     }
 
     public List getPostsByMode(int offset, int limit, PostOutputMode mode) {
@@ -81,8 +82,49 @@ public class PostsService {
         return postDAO.getPosts(postQueryBuilder);
     }
 
+    public PostsResponse getUserPosts(int offset, int limit, PostStatus status) {
+        PostQueryBuilder postQueryBuilder = new PostQueryBuilder(offset, limit);
+        String countFilterQuery;
+        switch (status) {
+            default:
+            case inactive:
+                countFilterQuery = " p.is_active = 0 ";
+                postQueryBuilder.where(countFilterQuery);
+                break;
+            case pending:
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'NEW' ";
+                postQueryBuilder.where(countFilterQuery);
+                break;
+            case declined:
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'DECLINED' ";
+                postQueryBuilder.where(countFilterQuery);
+                break;
+            case published:
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'ACCEPTED' ";
+                postQueryBuilder.where(countFilterQuery);
+                break;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
+        postQueryBuilder.where(" u.id = " + securityUser.getUserId());
+        return new PostsResponse(postRepository.getUserPostsCount(countFilterQuery),
+                postDAO.getPostsForModerationOrUserPosts(postQueryBuilder));
+    }
+
+
     public PostInterface getPostById(int id) {
         return postRepository.getPostById(id);
+    }
+
+    public void increasePostViewsCount(PostInterface post) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!auth.getName().equals("anonymousUser")) {
+            SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
+            if (!securityUser.getUserId().equals(post.getUserId())
+                    && securityUser.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
+                postRepository.increasePostViewsCount(post.getId());
+            }
+        }
     }
 
     //Различные методы по получению количества постов
@@ -92,6 +134,10 @@ public class PostsService {
     }
 
     public Integer getPostsForModerationCount() {
+        return postRepository.getPostsForModerationCount();
+    }
+
+    public Integer getUserPostsCount() {
         return postRepository.getPostsForModerationCount();
     }
 
@@ -105,16 +151,6 @@ public class PostsService {
 
     public Integer getPostsCountByTag(String tag) {
         return postRepository.getPostsCountByTag(tag);
-    }
-
-
-    public Map<LocalDate, Integer> getPostsCountByYear(String year) {
-        List<CalendarDTO> posts = calendarDao.getPostsCountByYear(String.valueOf(year));
-        return posts.stream().collect(Collectors.toMap(CalendarDTO::getDate, CalendarDTO::getCount));
-    }
-
-    public List<Integer> getYears() {
-        return postRepository.getYears();
     }
 
 
