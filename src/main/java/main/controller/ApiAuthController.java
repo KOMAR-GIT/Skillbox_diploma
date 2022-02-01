@@ -7,6 +7,7 @@ import main.api.response.RegisterResponse;
 import main.dto.UserDTO;
 import main.dto.UserForRegistrationDTO;
 import main.repository.UserRepository;
+import main.security.SecurityUser;
 import main.service.AuthCheckService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -69,8 +70,14 @@ public class ApiAuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user = (User) authentication.getPrincipal();
-        return new ResponseEntity<>(getLoginResponse(user.getUsername()), HttpStatus.OK);
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+        return new ResponseEntity<>(getLoginResponse(securityUser.getUsername()), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/auth/logout")
+    public ResponseEntity<Boolean> logout(){
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(true);
     }
 
     private LoginResponse getLoginResponse(String email) {

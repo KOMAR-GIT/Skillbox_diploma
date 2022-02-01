@@ -12,11 +12,14 @@ public class SecurityUser implements UserDetails {
 
     private final String username;
     private final String password;
+    private Integer id;
+
     private final List<SimpleGrantedAuthority> authorities;
 
-    public SecurityUser(String username, String password, List<SimpleGrantedAuthority> authorities) {
+    public SecurityUser(String username, String password, Integer id, List<SimpleGrantedAuthority> authorities) {
         this.username = username;
         this.password = password;
+        this.id = id;
         this.authorities = authorities;
     }
 
@@ -35,6 +38,12 @@ public class SecurityUser implements UserDetails {
     public String getUsername() {
         return username;
     }
+
+    public void setUserId(Integer id){
+        this.id = id;
+    }
+
+    public Integer getUserId(){return id;}
 
     @Override
     public boolean isAccountNonExpired() {

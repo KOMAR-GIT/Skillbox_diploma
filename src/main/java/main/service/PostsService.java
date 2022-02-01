@@ -1,12 +1,15 @@
 package main.service;
 
+import main.api.response.PostsResponse;
 import main.dto.interfaces.PostInterface;
 import main.model.enums.PostStatus;
+import main.model.enums.Role;
 import main.repository.DAO.PostDAO;
 import main.repository.DAO.builder.PostQueryBuilder;
 import main.repository.PostRepository;
+import main.security.SecurityUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -25,7 +28,7 @@ public class PostsService {
         this.postDAO = postDAO;
     }
 
-    public List getPostsForModeration(int offset, int limit){
+    public List getPostsForModeration(int offset, int limit) {
         return postDAO.getPostsForModerationOrUserPosts(new PostQueryBuilder(offset, limit));
     }
 
@@ -79,29 +82,50 @@ public class PostsService {
         return postDAO.getPosts(postQueryBuilder);
     }
 
-    public List getUserPosts(int offset, int limit, PostStatus status, Principal principal) {
+    public PostsResponse getUserPosts(int offset, int limit, PostStatus status, Principal principal) {
         PostQueryBuilder postQueryBuilder = new PostQueryBuilder(offset, limit);
-        switch (status){
+        String countFilterQuery;
+        switch (status) {
+            default:
             case inactive:
-                postQueryBuilder.where(" p.is_active = 0 ");
+                countFilterQuery = " p.is_active = 0 ";
+                postQueryBuilder.where(countFilterQuery);
                 break;
             case pending:
-                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'NEW' ");
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'NEW' ";
+                postQueryBuilder.where(countFilterQuery);
                 break;
             case declined:
-                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'DECLINED' ");
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'DECLINED' ";
+                postQueryBuilder.where(countFilterQuery);
                 break;
             case published:
-                postQueryBuilder.where(" p.is_active = 1 and p.moderation_status = 'ACCEPTED' ");
+                countFilterQuery = " p.is_active = 1 and p.moderation_status = 'ACCEPTED' ";
+                postQueryBuilder.where(countFilterQuery);
                 break;
         }
-        postQueryBuilder.where(" u.email = '" +  principal.getName() + "'");
-        return postDAO.getPostsForModerationOrUserPosts(postQueryBuilder);
+        postQueryBuilder.where(" u.email = '" + principal.getName() + "'");
+        return new PostsResponse(postRepository.getUserPostsCount(countFilterQuery),
+                postDAO.getPostsForModerationOrUserPosts(postQueryBuilder));
     }
 
 
     public PostInterface getPostById(int id) {
         return postRepository.getPostById(id);
+    }
+
+    public void increasePostViewsCount(PostInterface post, Principal principal) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(auth.getName());
+
+        if (!auth.getName().equals("anonymousUser")) {
+            SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
+            List s = (List) securityUser.getAuthorities();
+            if (!securityUser.getUserId().equals(post.getUserId())
+                    && !securityUser.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("user:moderate"))) {
+                postRepository.increasePostViewsCount(post.getId());
+            }
+        }
     }
 
     //Различные методы по получению количества постов
@@ -111,6 +135,10 @@ public class PostsService {
     }
 
     public Integer getPostsForModerationCount() {
+        return postRepository.getPostsForModerationCount();
+    }
+
+    public Integer getUserPostsCount() {
         return postRepository.getPostsForModerationCount();
     }
 
@@ -125,9 +153,6 @@ public class PostsService {
     public Integer getPostsCountByTag(String tag) {
         return postRepository.getPostsCountByTag(tag);
     }
-
-
-
 
 
 }

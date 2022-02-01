@@ -5,8 +5,9 @@ import main.api.response.PostsResponse;
 import main.dto.*;
 import main.dto.interfaces.CommentInterface;
 import main.dto.interfaces.PostInterface;
-import main.model.Post;
 import main.model.enums.PostStatus;
+import main.security.SecurityUser;
+import main.security.UserDetailsServiceImpl;
 import main.service.PostCommentsService;
 import main.service.PostOutputMode;
 import main.service.PostsService;
@@ -15,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,7 +55,7 @@ public class ApiPostController {
     ) {
         List<PostDto> posts = postsService.getPostsByMode(offset, limit, mode);
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsCount(), posts), HttpStatus.OK);
+        return ResponseEntity.ok(new PostsResponse(postsService.getPostsCount(), posts));
     }
 
     @GetMapping("/api/post/search")
@@ -63,7 +66,7 @@ public class ApiPostController {
     ) {
         List<PostDto> posts = postsService.getPostsByQuery(offset, limit, query);
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsCount(query), posts), HttpStatus.OK);
+        return ResponseEntity.ok(new PostsResponse(postsService.getPostsCount(query), posts));
     }
 
     @GetMapping("/api/post/byDate")
@@ -74,7 +77,7 @@ public class ApiPostController {
     ) {
         List<PostDto> posts = postsService.getPostsByDate(offset, limit, LocalDate.parse(date));
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsCountByDate(date), posts), HttpStatus.OK);
+        return ResponseEntity.ok(new PostsResponse(postsService.getPostsCountByDate(date), posts));
     }
 
     @GetMapping("/api/post/byTag")
@@ -85,22 +88,25 @@ public class ApiPostController {
     ) {
         List<PostDto> posts = postsService.getPostsByTag(offset, limit, tag);
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsCountByTag(tag), posts), HttpStatus.OK);
+        return ResponseEntity.ok(new PostsResponse(postsService.getPostsCountByTag(tag), posts));
     }
 
     //Не реализовано увеличение количества просмотров
     @GetMapping("/api/post/{id}")
-    public ResponseEntity<PostByIdResponse> getPostsById(@PathVariable Integer id) {
+    public ResponseEntity<PostByIdResponse> getPostsById(
+            @PathVariable Integer id,
+            Principal principal) {
         PostInterface post = postsService.getPostById(id);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return new ResponseEntity<>(new PostByIdResponse(post, postCommentsService
+        postsService.increasePostViewsCount(post, principal);
+        return ResponseEntity.ok(new PostByIdResponse(post, postCommentsService
                 .getComments(id)
                 .stream()
                 .map(this::convertPostCommentToPostCommentsDTO)
                 .collect(Collectors.toList()),
-                tagsService.getPostTags(id)), HttpStatus.OK);
+                tagsService.getPostTags(id)));
     }
 
     @GetMapping("/api/post/moderation")
@@ -110,7 +116,7 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
         List<PostDto> posts = postsService.getPostsForModeration(offset, limit);
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsForModerationCount(), posts), HttpStatus.OK);
+        return ResponseEntity.ok(new PostsResponse(postsService.getPostsForModerationCount(), posts));
     }
 
     @GetMapping("/api/post/my")
@@ -120,9 +126,9 @@ public class ApiPostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit,
             @RequestParam(value = "status", defaultValue = "inactive") PostStatus status,
             Principal principal) {
-        List<PostDto> posts = postsService.getUserPosts(offset, limit, status, principal);
-        posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
-        return new ResponseEntity<>(new PostsResponse(postsService.getPostsForModerationCount(), posts), HttpStatus.OK);
+        PostsResponse posts = postsService.getUserPosts(offset, limit, status, principal);
+        posts.getPosts().forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
+        return ResponseEntity.ok(posts);
     }
 
 
