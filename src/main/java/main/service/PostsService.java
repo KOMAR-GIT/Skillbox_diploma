@@ -82,7 +82,7 @@ public class PostsService {
         return postDAO.getPosts(postQueryBuilder);
     }
 
-    public PostsResponse getUserPosts(int offset, int limit, PostStatus status, Principal principal) {
+    public PostsResponse getUserPosts(int offset, int limit, PostStatus status) {
         PostQueryBuilder postQueryBuilder = new PostQueryBuilder(offset, limit);
         String countFilterQuery;
         switch (status) {
@@ -104,7 +104,9 @@ public class PostsService {
                 postQueryBuilder.where(countFilterQuery);
                 break;
         }
-        postQueryBuilder.where(" u.email = '" + principal.getName() + "'");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
+        postQueryBuilder.where(" u.id = " + securityUser.getUserId());
         return new PostsResponse(postRepository.getUserPostsCount(countFilterQuery),
                 postDAO.getPostsForModerationOrUserPosts(postQueryBuilder));
     }
@@ -114,15 +116,12 @@ public class PostsService {
         return postRepository.getPostById(id);
     }
 
-    public void increasePostViewsCount(PostInterface post, Principal principal) {
+    public void increasePostViewsCount(PostInterface post) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(auth.getName());
-
         if (!auth.getName().equals("anonymousUser")) {
             SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
-            List s = (List) securityUser.getAuthorities();
             if (!securityUser.getUserId().equals(post.getUserId())
-                    && !securityUser.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("user:moderate"))) {
+                    && securityUser.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
                 postRepository.increasePostViewsCount(post.getId());
             }
         }

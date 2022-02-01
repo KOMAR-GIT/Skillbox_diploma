@@ -100,7 +100,7 @@ public class ApiPostController {
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        postsService.increasePostViewsCount(post, principal);
+        postsService.increasePostViewsCount(post);
         return ResponseEntity.ok(new PostByIdResponse(post, postCommentsService
                 .getComments(id)
                 .stream()
@@ -124,9 +124,8 @@ public class ApiPostController {
     public ResponseEntity<PostsResponse> getUserPosts(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "limit", defaultValue = "10") int limit,
-            @RequestParam(value = "status", defaultValue = "inactive") PostStatus status,
-            Principal principal) {
-        PostsResponse posts = postsService.getUserPosts(offset, limit, status, principal);
+            @RequestParam(value = "status", defaultValue = "inactive") PostStatus status) {
+        PostsResponse posts = postsService.getUserPosts(offset, limit, status);
         posts.getPosts().forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
         return ResponseEntity.ok(posts);
     }

@@ -3,6 +3,7 @@ package main.controller;
 import main.api.request.LoginRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
+import main.api.response.LogoutResponse;
 import main.api.response.RegisterResponse;
 import main.dto.UserDTO;
 import main.dto.UserForRegistrationDTO;
@@ -75,9 +76,9 @@ public class ApiAuthController {
     }
 
     @GetMapping("/api/auth/logout")
-    public ResponseEntity<Boolean> logout(){
+    public ResponseEntity<LogoutResponse> logout(){
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(true);
+        return ResponseEntity.ok(new LogoutResponse(true));
     }
 
     private LoginResponse getLoginResponse(String email) {
