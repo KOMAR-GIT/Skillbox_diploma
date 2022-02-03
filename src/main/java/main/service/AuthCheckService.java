@@ -40,10 +40,6 @@ public class AuthCheckService {
         captchaCodeRepository.deleteOldCaptcha(captchaLifetime);
     }
 
-//    public AuthCheckResponse getAuthCheck() {
-//        return new AuthCheckResponse(false);
-//    }
-
     public CaptchaResponse generateCaptchaCodes() {
         Cage cage = new GCage();
         String token = cage.getTokenGenerator().next();
