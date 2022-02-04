@@ -15,7 +15,7 @@ public interface CaptchaCodeRepository extends CrudRepository<CaptchaCode, Integ
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM blogengine.captcha_codes cc where cc.time < timestampadd(SECOND, -:time , UTC_TIMESTAMP())", nativeQuery = true)
+    @Query(value = "DELETE FROM blogengine.captcha_codes where (captcha_codes.time < timestampadd(SECOND, -3600 , UTC_TIMESTAMP()))", nativeQuery = true)
     void deleteOldCaptcha(@Param("time") int time);
 
 }
