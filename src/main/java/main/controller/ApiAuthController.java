@@ -3,8 +3,8 @@ package main.controller;
 import main.api.request.LoginRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
-import main.api.response.LogoutResponse;
-import main.api.response.RegisterResponse;
+import main.api.response.SuccessResultResponse;
+import main.api.response.ResponseWithErrors;
 import main.dto.UserDTO;
 import main.dto.UserForRegistrationDTO;
 import main.repository.UserRepository;
@@ -17,7 +17,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,9 +59,9 @@ public class ApiAuthController {
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody UserForRegistrationDTO user) {
-        RegisterResponse registerResponse = new RegisterResponse(authCheckService.addNewUser(user));
-        return new ResponseEntity<>(registerResponse, HttpStatus.OK);
+    public ResponseEntity<ResponseWithErrors> register(@RequestBody UserForRegistrationDTO user) {
+        ResponseWithErrors responseWithErrors = authCheckService.addNewUser(user);
+        return new ResponseEntity<>(responseWithErrors, HttpStatus.OK);
     }
 
     @PostMapping("/api/auth/login")
@@ -76,9 +75,9 @@ public class ApiAuthController {
     }
 
     @GetMapping("/api/auth/logout")
-    public ResponseEntity<LogoutResponse> logout(){
+    public ResponseEntity<SuccessResultResponse> logout(){
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(new LogoutResponse(true));
+        return ResponseEntity.ok(new SuccessResultResponse(true));
     }
 
     private LoginResponse getLoginResponse(String email) {

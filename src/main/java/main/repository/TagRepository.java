@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TagRepository extends CrudRepository<Tag, Integer> {
@@ -77,5 +78,7 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             " FROM " +
             "   weights", nativeQuery = true)
     List<TagInterface> getAllTags();
+
+    List<Tag> findTagsByNameIn(List<String> tags);
 
 }

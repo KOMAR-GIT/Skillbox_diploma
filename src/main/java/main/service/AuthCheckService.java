@@ -4,6 +4,7 @@ import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.api.response.AuthCheckResponse;
 import main.api.response.CaptchaResponse;
+import main.api.response.ResponseWithErrors;
 import main.dto.ErrorsForRegistration;
 import main.dto.UserForRegistrationDTO;
 import main.model.CaptchaCode;
@@ -53,7 +54,7 @@ public class AuthCheckService {
         return captchaCodeRepository.findBySecretCode(secretCode) != null;
     }
 
-    public Map<String, String> addNewUser(UserForRegistrationDTO userDTO) {
+    public ResponseWithErrors addNewUser(UserForRegistrationDTO userDTO) {
         Map<String, String> errors = new HashMap<>();
         isEmailValid(userDTO.getEmail(), errors);
         isNameCorrect(userDTO.getName(), errors);
@@ -69,9 +70,9 @@ public class AuthCheckService {
                     userDTO.getCaptcha(),
                     null);
             userRepository.save(user);
-            return null;
+            return new ResponseWithErrors(true, null);
         }
-        return errors;
+        return new ResponseWithErrors(false, errors);
     }
 
 

@@ -27,6 +27,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
 
     @Query(value = "SELECT " +
             "   p.id as id," +
+            "   p.moderation_status as moderationStatus, " +
             "   p.time as timestamp," +
             "   p.is_active as active, " +
             "   u.id as userId," +
@@ -42,16 +43,8 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "   users u ON p.user_id = u.id " +
             " LEFT JOIN " +
             "   post_votes pv ON p.id = pv.post_id " +
-            " WHERE " +
-            "   is_active = 1 " +
-            " and " +
-            "   moderation_status = 'ACCEPTED' " +
-            " and " +
-            "   p.time <= curdate() " +
-            " and " +
-            "   p.id = :id" +
-            " group by " +
-            "   p.id", nativeQuery = true)
+            " WHERE p.id = :id" +
+            " group by p.id", nativeQuery = true)
     PostInterface getPostById(@Param("id") int id);
 
     @Transactional
@@ -97,7 +90,6 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "   and time <= curdate() " +
             "group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
-
 
 
 }

@@ -2,12 +2,11 @@ package main.controller;
 
 import main.api.response.PostByIdResponse;
 import main.api.response.PostsResponse;
+import main.api.response.ResponseWithErrors;
 import main.dto.*;
 import main.dto.interfaces.CommentInterface;
 import main.dto.interfaces.PostInterface;
 import main.model.enums.PostStatus;
-import main.security.SecurityUser;
-import main.security.UserDetailsServiceImpl;
 import main.service.PostCommentsService;
 import main.service.PostOutputMode;
 import main.service.PostsService;
@@ -16,14 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,13 +24,10 @@ import java.util.stream.Collectors;
 @RestController
 public class ApiPostController {
 
-
     private final PostsService postsService;
     private final PostCommentsService postCommentsService;
     private final TagsService tagsService;
-
     private final ModelMapper modelMapper;
-
 
     public ApiPostController(PostsService postsService, PostCommentsService postCommentsService, TagsService tagsService, ModelMapper modelMapper) {
         this.postsService = postsService;
@@ -91,11 +81,9 @@ public class ApiPostController {
         return ResponseEntity.ok(new PostsResponse(postsService.getPostsCountByTag(tag), posts));
     }
 
-    //Не реализовано увеличение количества просмотров
     @GetMapping("/api/post/{id}")
     public ResponseEntity<PostByIdResponse> getPostsById(
-            @PathVariable Integer id,
-            Principal principal) {
+            @PathVariable Integer id) {
         PostInterface post = postsService.getPostById(id);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -128,6 +116,21 @@ public class ApiPostController {
         PostsResponse posts = postsService.getUserPosts(offset, limit, status);
         posts.getPosts().forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
         return ResponseEntity.ok(posts);
+    }
+
+    @PostMapping("/api/post")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<ResponseWithErrors> addPost(@RequestBody AddAndEditPostDTO addAndEditPostDTO) {
+        ResponseWithErrors responseWithErrors = postsService.addPost(addAndEditPostDTO);
+        return ResponseEntity.ok(responseWithErrors);
+    }
+
+    @PutMapping("/api/post/{id}")
+    public ResponseEntity<ResponseWithErrors> editPost(
+            @PathVariable Integer id,
+            @RequestBody AddAndEditPostDTO addAndEditPostDTO) {
+        ResponseWithErrors responseWithErrors = postsService.editPost(id, addAndEditPostDTO);
+        return ResponseEntity.ok(responseWithErrors);
     }
 
 

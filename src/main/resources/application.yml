@@ -18,7 +18,15 @@ spring:
 
 logging:
   level:
-    sql: debug
+    org:
+      hibernate:
+        SQL:
+          TRACE
+        type:
+          descriptor:
+            sql:
+              BasicBinder:
+                TRACE
 
 blog:
   title: DevPub

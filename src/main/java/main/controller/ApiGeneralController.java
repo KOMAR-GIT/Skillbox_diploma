@@ -31,21 +31,18 @@ public class ApiGeneralController {
 
     private final TagsService tagsService;
 
-    private final PostsService postsService;
-
     private final CalendarService calendarService;
 
     public ApiGeneralController(SettingsService settingsService,
                                 InitResponse initResponse,
                                 ModelMapper modelMapper,
                                 TagsService tagsService,
-                                PostsService postsService, CalendarService calendarService)
+                                CalendarService calendarService)
     {
         this.settingsService = settingsService;
         this.initResponse = initResponse;
         this.modelMapper = modelMapper;
         this.tagsService = tagsService;
-        this.postsService = postsService;
         this.calendarService = calendarService;
     }
 
