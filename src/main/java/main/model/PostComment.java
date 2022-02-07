@@ -8,7 +8,7 @@ import java.util.Date;
 public class PostComment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
@@ -30,6 +30,14 @@ public class PostComment {
     private String text;
 
     public PostComment() {
+    }
+
+    public PostComment(PostComment parent, Post post, User user, Date time, String text) {
+        this.parent = parent;
+        this.post = post;
+        this.user = user;
+        this.time = time;
+        this.text = text;
     }
 
     public Integer getId() {

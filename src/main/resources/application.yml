@@ -37,3 +37,5 @@ blog:
   copyrightFrom: 2021
 captcha:
   lifetimeInMinutes: 3600
+upload:
+  path: src\main\upload

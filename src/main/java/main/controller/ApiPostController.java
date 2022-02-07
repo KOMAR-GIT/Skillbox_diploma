@@ -1,20 +1,19 @@
 package main.controller;
 
-import main.api.response.PostByIdResponse;
-import main.api.response.PostsResponse;
-import main.api.response.ResponseWithErrors;
+import main.api.request.AddCommentRequest;
+import main.api.response.*;
 import main.dto.*;
 import main.dto.interfaces.CommentInterface;
 import main.dto.interfaces.PostInterface;
 import main.model.enums.PostStatus;
-import main.service.PostCommentsService;
-import main.service.PostOutputMode;
-import main.service.PostsService;
-import main.service.TagsService;
+import main.security.SecurityUser;
+import main.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -133,6 +132,22 @@ public class ApiPostController {
         return ResponseEntity.ok(responseWithErrors);
     }
 
+    @PostMapping("/api/comment")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest addCommentRequest) {
+        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AddCommentResponse addCommentResponse = postCommentsService.addComment(
+                addCommentRequest.getParentId(),
+                addCommentRequest.getPostId(),
+                addCommentRequest.getText(),
+                securityUser.getUserId());
+
+        if (addCommentResponse.getId() != null) {
+            return ResponseEntity.ok(addCommentResponse);
+        }
+        return ResponseEntity.badRequest().body(addCommentResponse);
+
+    }
 
     public PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
         PostCommentsDTO postCommentsDTO = modelMapper.map(commentInterface, PostCommentsDTO.class);

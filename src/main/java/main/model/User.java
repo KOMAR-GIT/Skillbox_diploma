@@ -37,6 +37,10 @@ public class User {
     public User() {
     }
 
+    public User(Integer id) {
+        this.id = id;
+    }
+
     public User(Integer id, Boolean isModerator, Date regTime, String name, String email, String password, String code, String photo) {
         this.id = id;
         this.isModerator = isModerator;

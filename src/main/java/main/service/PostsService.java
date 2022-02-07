@@ -53,6 +53,8 @@ public class PostsService {
         return postDAO.getPostsForModerationOrUserPosts(new PostQueryBuilder(offset, limit));
     }
 
+    public Post findPostById(int id){return postRepository.findById(id).orElse(null);};
+
     public List getPostsByMode(int offset, int limit, PostOutputMode mode) {
         String sortMode;
         switch (mode) {

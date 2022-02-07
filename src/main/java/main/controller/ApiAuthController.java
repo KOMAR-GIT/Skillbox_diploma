@@ -3,13 +3,12 @@ package main.controller;
 import main.api.request.LoginRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
-import main.api.response.SuccessResultResponse;
 import main.api.response.ResponseWithErrors;
-import main.dto.UserDTO;
+import main.api.response.SuccessResultResponse;
 import main.dto.UserForRegistrationDTO;
-import main.repository.UserRepository;
 import main.security.SecurityUser;
 import main.service.AuthCheckService;
+import main.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,27 +28,24 @@ public class ApiAuthController {
 
     private final AuthCheckService authCheckService;
 
-    private final ModelMapper modelMapper;
-
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
 
+    private final UserService userService;
 
-    public ApiAuthController(AuthCheckService authCheckService, ModelMapper modelMapper,
+    public ApiAuthController(AuthCheckService authCheckService,
                              AuthenticationManager authenticationManager,
-                             UserRepository userRepository) {
+                             UserService userService) {
         this.authCheckService = authCheckService;
-        this.modelMapper = modelMapper;
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/api/auth/check")
     public ResponseEntity<LoginResponse> authCheck(Principal principal) {
-        if(principal == null){
+        if (principal == null) {
             return new ResponseEntity<>(new LoginResponse(), HttpStatus.OK);
         }
-        return new ResponseEntity<>(getLoginResponse(principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getLoginResponse(principal.getName()), HttpStatus.OK);
     }
 
 
@@ -71,22 +67,13 @@ public class ApiAuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-        return new ResponseEntity<>(getLoginResponse(securityUser.getUsername()), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getLoginResponse(securityUser.getUsername()), HttpStatus.OK);
     }
 
     @GetMapping("/api/auth/logout")
-    public ResponseEntity<SuccessResultResponse> logout(){
+    public ResponseEntity<SuccessResultResponse> logout() {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(new SuccessResultResponse(true));
-    }
-
-    private LoginResponse getLoginResponse(String email) {
-        main.model.User currentUser =
-                userRepository.getByEmail(email);
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setResult(true);
-        loginResponse.setUser(modelMapper.map(currentUser, UserDTO.class));
-        return loginResponse;
     }
 
 

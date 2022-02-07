@@ -55,7 +55,7 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             "               (SELECT " +
             "                   * " +
             "                FROM " +
-            "                   total_post_count)) weight " +
+            "                   total_post_count)) tagWeight " +
             "        FROM " +
             "           tag2post tp " +
             "           JOIN tags t on tp.tag_id = t.id " +
@@ -66,15 +66,15 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             "        GROUP BY tp.tag_id)" +
             " SELECT " +
             "   name," +
-            "   (weight * " +
+            "   (tagWeight * " +
             "       (1 / " +
             "           (SELECT " +
-            "               weight " +
+            "               tagWeight " +
             "            FROM " +
             "               weights " +
             "            order by " +
-            "               weight desc " +
-            "            limit 1))) " +
+            "               tagWeight desc " +
+            "            limit 1))) as weight" +
             " FROM " +
             "   weights", nativeQuery = true)
     List<TagInterface> getAllTags();
