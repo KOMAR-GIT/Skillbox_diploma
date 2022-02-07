@@ -76,7 +76,9 @@ public class Post {
     public Post() {
     }
 
-
+    public Post(Integer id) {
+        this.id = id;
+    }
 
     public Integer getId() {
         return id;

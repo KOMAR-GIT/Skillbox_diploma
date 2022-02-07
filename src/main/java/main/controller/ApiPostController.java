@@ -1,6 +1,7 @@
 package main.controller;
 
 import main.api.request.AddCommentRequest;
+import main.api.request.LikeDislikeRequest;
 import main.api.response.*;
 import main.dto.*;
 import main.dto.interfaces.CommentInterface;
@@ -12,7 +13,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +27,14 @@ public class ApiPostController {
     private final PostCommentsService postCommentsService;
     private final TagsService tagsService;
     private final ModelMapper modelMapper;
+    private final PostVotesService postVotesService;
 
-    public ApiPostController(PostsService postsService, PostCommentsService postCommentsService, TagsService tagsService, ModelMapper modelMapper) {
+    public ApiPostController(PostsService postsService, PostCommentsService postCommentsService, TagsService tagsService, ModelMapper modelMapper, PostVotesService postVotesService) {
         this.postsService = postsService;
         this.postCommentsService = postCommentsService;
         this.tagsService = tagsService;
         this.modelMapper = modelMapper;
+        this.postVotesService = postVotesService;
     }
 
 
@@ -148,6 +150,25 @@ public class ApiPostController {
         return ResponseEntity.badRequest().body(addCommentResponse);
 
     }
+
+    @PostMapping("/api/post/like")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<LikeDislikeResponse> like(@RequestBody LikeDislikeRequest likeDislikeRequest){
+        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LikeDislikeResponse likeDislikeResponse = postVotesService.addLike(likeDislikeRequest.getPostId(), securityUser.getUserId());
+        return ResponseEntity.ok(likeDislikeResponse);
+    }
+
+    @PostMapping("/api/post/dislike")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<LikeDislikeResponse> dislike(@RequestBody LikeDislikeRequest likeDislikeRequest){
+        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LikeDislikeResponse likeDislikeResponse = postVotesService.addDislike(likeDislikeRequest.getPostId(), securityUser.getUserId());
+        return ResponseEntity.ok(likeDislikeResponse);
+    }
+
+
+
 
     public PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
         PostCommentsDTO postCommentsDTO = modelMapper.map(commentInterface, PostCommentsDTO.class);

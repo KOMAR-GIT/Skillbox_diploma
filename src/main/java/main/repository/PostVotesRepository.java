@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostVotesRepository extends CrudRepository<PostVotes, Integer> {
 
+    PostVotes findByPostIdAndUserId(int postId, int userId);
+
 }

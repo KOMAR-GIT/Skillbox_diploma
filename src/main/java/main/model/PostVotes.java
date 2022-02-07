@@ -28,6 +28,13 @@ public class PostVotes {
     public PostVotes() {
     }
 
+    public PostVotes(Post post, User user, Date time, Boolean value) {
+        this.post = post;
+        this.user = user;
+        this.time = time;
+        this.value = value;
+    }
+
     public Integer getId() {
         return id;
     }
