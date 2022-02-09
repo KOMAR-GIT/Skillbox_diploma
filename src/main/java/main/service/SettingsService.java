@@ -1,7 +1,9 @@
 package main.service;
 
 import main.api.response.SettingsResponse;
+import main.dto.GlobalSettingsCodes;
 import main.dto.interfaces.GlobalSettingsInterface;
+import main.model.GlobalSetting;
 import main.repository.GlobalSettingsRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,7 @@ public class SettingsService {
     }
 
 
-    public SettingsResponse getGlobalSettings(){
+    public SettingsResponse getAllGlobalSettings() {
         SettingsResponse settingsResponse = new SettingsResponse();
         List<GlobalSettingsInterface> settings = globalSettingsRepository.getSettings();
         for (GlobalSettingsInterface setting : settings) {
@@ -30,8 +32,12 @@ public class SettingsService {
                     settingsResponse.setStatisticIsPublic(setting.getValue());
             }
         }
-
         return settingsResponse;
+    }
+
+    public Boolean getOneSetting(GlobalSettingsCodes code) {
+        String value = globalSettingsRepository.findByCode(code.toString()).getValue();
+        return value.equals("1");
     }
 
 }

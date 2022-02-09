@@ -18,9 +18,9 @@ public class PostQueryBuilder {
             "   p.title," +
             "   p.text as announce," +
             "   p.view_count as viewCount," +
-            "   COUNT(pc.id) AS commentCount," +
-            "   sum(case when pv.value = true then 1 else 0 end) AS likeCount," +
-            "   sum(case when pv.value = false then 1 else 0 end) AS dislikeCount " +
+            "   (select count(*) from blogengine.posts join post_comments on posts.id = post_comments.post_id where posts.id = p.id) AS commentCount," +
+            "   (select count(*) from blogengine.posts join post_votes on posts.id = post_votes.post_id where posts.id = p.id and post_votes.value = 1) AS likeCount," +
+            "   (select count(*) from blogengine.posts join post_votes on posts.id = post_votes.post_id where posts.id = p.id and post_votes.value = 0) AS dislikeCount " +
             " FROM" +
             "   blogengine.posts p " +
             " LEFT JOIN " +

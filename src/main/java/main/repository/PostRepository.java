@@ -1,6 +1,7 @@
 package main.repository;
 
 import main.dto.interfaces.PostInterface;
+import main.dto.interfaces.StatisticsInterface;
 import main.model.Post;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,14 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "   moderation_status = 'ACCEPTED'" +
             " and " +
             "   time <= curdate()";
+    String postVotesQuery = "(SELECT " +
+            "            COUNT(*)" +
+            "        FROM" +
+            "            blogengine.posts" +
+            "                JOIN" +
+            "            post_votes ON posts.id = post_votes.post_id" +
+            "        WHERE" +
+            "            posts.id = p.id AND post_votes.value";
 
     @Query(value = "SELECT " +
             "   p.id as id," +
@@ -34,8 +43,8 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "   u.name userName," +
             "   p.title as title," +
             "   p.text as text," +
-            "   (SELECT COUNT(*) FROM post_votes pv WHERE pv.value = TRUE) AS likeCount," +
-            "   (SELECT COUNT(*) FROM post_votes pv WHERE pv.value = FALSE) AS dislikeCount, " +
+            "   " + postVotesQuery + " = TRUE) AS likeCount," +
+            "   " + postVotesQuery + " = FALSE) AS dislikeCount, " +
             "   p.view_count as viewCount " +
             " FROM" +
             "   posts p " +
@@ -91,5 +100,20 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
 
+    @Query(value = " SELECT count(*) postsCount, " +
+            " (SELECT count(*) FROM blogengine.post_votes where post_id = p.id and value = 1) likesCount, " +
+            " (SELECT count(*) FROM blogengine.post_votes where post_id = p.id and value = 0) dislikesCount, " +
+            " (SELECT SUM(posts.view_count) from posts where user_id = p.user_id ) viewsCount, " +
+            " min(p.time) firstPublication " +
+            " FROM blogengine.posts p where p.user_id = :id", nativeQuery = true)
+    StatisticsInterface getUserStatistics(@Param("id") int id);
+
+    @Query(value = " SELECT count(*) postsCount, " +
+            " (SELECT count(*) FROM blogengine.post_votes where value = 1) likesCount, " +
+            " (SELECT count(*) FROM blogengine.post_votes where value = 0) dislikesCount, " +
+            " (SELECT SUM(posts.view_count) from posts) viewsCount, " +
+            " min(p.time) firstPublication " +
+            " FROM blogengine.posts p", nativeQuery = true)
+    StatisticsInterface getGlobalStatistics();
 
 }

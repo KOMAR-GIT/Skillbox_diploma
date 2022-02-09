@@ -49,7 +49,7 @@ public class ApiGeneralController {
 
     @GetMapping("/api/settings")
     public SettingsResponse settings() {
-        return settingsService.getGlobalSettings();
+        return settingsService.getAllGlobalSettings();
     }
 
     @GetMapping("/api/init")
@@ -60,7 +60,6 @@ public class ApiGeneralController {
     @GetMapping("/api/tag")
     public ResponseEntity<TagResponse> tags(@RequestParam(value = "query", defaultValue = "") String query) {
         List<TagInterface> tagInterfaces = tagsService.getTagsByQuery(query);
-        System.out.println(tagInterfaces.get(0).getWeight());
         TagResponse tagResponse = new TagResponse(
                 tagInterfaces.stream().map(this::convertTagToTagDTO).collect(Collectors.toList()));
 
