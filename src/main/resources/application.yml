@@ -38,4 +38,4 @@ blog:
 captcha:
   lifetimeInMinutes: 3600
 upload:
-  path: src\main\upload
+  path: upload/

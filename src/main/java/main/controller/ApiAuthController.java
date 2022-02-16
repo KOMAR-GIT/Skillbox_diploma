@@ -1,5 +1,6 @@
 package main.controller;
 
+import main.api.request.EditProfileRequest;
 import main.api.request.LoginRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
@@ -9,20 +10,16 @@ import main.dto.UserForRegistrationDTO;
 import main.security.SecurityUser;
 import main.service.AuthCheckService;
 import main.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.security.Principal;
 
 @RestController
@@ -71,15 +68,40 @@ public class ApiAuthController {
             SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
             return new ResponseEntity<>(userService.getLoginResponse(securityUser.getUsername()), HttpStatus.OK);
         } catch (Exception e) {
-            logout();
+            return ResponseEntity.ok(new LoginResponse(false, null));
+
         }
-        return ResponseEntity.ok(new LoginResponse(false, null));
     }
 
     @GetMapping("/api/auth/logout")
     public ResponseEntity<SuccessResultResponse> logout() {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(new SuccessResultResponse(true));
+    }
+
+    @PostMapping("/api/profile/my")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<ResponseWithErrors> editProfile(
+            @RequestHeader("content-type") String contentType,
+            @ModelAttribute EditProfileRequest editProfileRequest) throws IOException {
+        SecurityUser securityUser = (SecurityUser)
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+        contentType = contentType.replaceAll(";.+","");
+        switch (contentType) {
+            case "multipart/form-data":
+                return ResponseEntity.ok(
+                        authCheckService
+                                .editProfileWithPhoto(securityUser.getUserId(), editProfileRequest));
+            case "application/json":
+                return ResponseEntity.ok(
+                        authCheckService
+                                .editProfileWithoutPhoto(securityUser.getUserId(), editProfileRequest));
+            default:
+                return ResponseEntity.ok(new ResponseWithErrors(false, null));
+        }
     }
 
 
