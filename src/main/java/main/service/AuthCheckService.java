@@ -11,10 +11,16 @@ import main.model.CaptchaCode;
 import main.model.User;
 import main.repository.CaptchaCodeRepository;
 import main.repository.UserRepository;
+import main.security.SecurityUser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,7 +99,8 @@ public class AuthCheckService {
 //    public ResponseWithErrors postImage(MultipartFile photo){
 //    }
 
-    public ResponseWithErrors editProfileWithPhoto(int userId, EditProfileRequest editProfileRequest) throws IOException {
+    public ResponseWithErrors editProfileWithPhoto(int userId, EditProfileRequest editProfileRequest)
+            throws IOException {
 
         Map<String, String> errors = new HashMap<>();
         User user = userRepository.findById(userId).get();
@@ -107,17 +114,17 @@ public class AuthCheckService {
         user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
                 ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
 
-        String photoPath = savePhoto(editProfileRequest.getPhoto(), true);
+//        String photoPath = savePhoto(editProfileRequest.getPhoto(), true);
 
         String oldPhoto = user.getPhoto();
 
         File oldPhotoFile = new File(oldPhoto);
 
-        if(oldPhotoFile.exists()){
+        if (oldPhotoFile.exists()) {
             oldPhotoFile.delete();
         }
 
-        user.setPhoto(photoPath.isEmpty() ? null : photoPath);
+//        user.setPhoto(photoPath.isEmpty() ? null : photoPath);
 
         if (errors.isEmpty()) {
             userRepository.save(user);
@@ -140,12 +147,25 @@ public class AuthCheckService {
                 ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
 
 
-        if (editProfileRequest.getRemovePhoto()) {
+        if (editProfileRequest.getRemovePhoto() != null && editProfileRequest.getRemovePhoto()) {
             user.setPhoto(null);
         }
 
         if (errors.isEmpty()) {
             userRepository.save(user);
+            List authorities = new ArrayList();
+            authorities.addAll(user.getRole().getAuthorities());
+            SecurityUser securityUser = new SecurityUser(
+                    user.getEmail(),
+                    user.getPassword(),
+                    userId,
+                    authorities);
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            securityUser,
+                            securityUser.getPassword(),
+                            securityUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             return new ResponseWithErrors(true, null);
         }
         return new ResponseWithErrors(false, errors);

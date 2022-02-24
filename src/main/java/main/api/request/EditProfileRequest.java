@@ -4,28 +4,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class EditProfileRequest {
 
-    private MultipartFile photo;
     private String name;
     private String email;
     private String password;
     private Boolean removePhoto;
+    private MultipartFile photo;
 
     public EditProfileRequest() {
     }
 
-    public EditProfileRequest(MultipartFile photo, String name, String email, String password, Boolean removePhoto) {
-        this.photo = photo;
+    public EditProfileRequest(String name, String email, String password, Boolean removePhoto, MultipartFile photo) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.removePhoto = removePhoto;
-    }
-
-    public MultipartFile getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(MultipartFile photo) {
         this.photo = photo;
     }
 
@@ -59,5 +51,13 @@ public class EditProfileRequest {
 
     public void setRemovePhoto(Boolean removePhoto) {
         this.removePhoto = removePhoto;
+    }
+
+    public MultipartFile getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(MultipartFile photo) {
+        this.photo = photo;
     }
 }

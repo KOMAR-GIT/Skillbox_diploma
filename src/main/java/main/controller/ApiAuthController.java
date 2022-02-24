@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -82,14 +83,14 @@ public class ApiAuthController {
     @PostMapping("/api/profile/my")
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResponseWithErrors> editProfile(
-            @RequestHeader("content-type") String contentType,
-            @ModelAttribute EditProfileRequest editProfileRequest) throws IOException {
+            @RequestHeader("Content-Type") String contentType,
+            @RequestBody EditProfileRequest editProfileRequest) throws IOException {
         SecurityUser securityUser = (SecurityUser)
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication()
                         .getPrincipal();
-        contentType = contentType.replaceAll(";.+","");
+        contentType = contentType.replaceAll(";.+", "");
         switch (contentType) {
             case "multipart/form-data":
                 return ResponseEntity.ok(
