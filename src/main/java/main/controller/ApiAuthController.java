@@ -11,6 +11,7 @@ import main.security.SecurityUser;
 import main.service.AuthCheckService;
 import main.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -74,36 +74,34 @@ public class ApiAuthController {
         }
     }
 
-    @GetMapping("/api/auth/logout")
+    @GetMapping(value = "/api/auth/logout")
     public ResponseEntity<SuccessResultResponse> logout() {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(new SuccessResultResponse(true));
     }
 
-    @PostMapping("/api/profile/my")
+
+    //не удаляются старые фотки
+
+    @PostMapping(value = "/api/profile/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<ResponseWithErrors> editProfile(
-            @RequestHeader("Content-Type") String contentType,
-            @RequestBody EditProfileRequest editProfileRequest) throws IOException {
+    public ResponseEntity<ResponseWithErrors> editProfileWithPhoto(
+            @ModelAttribute EditProfileRequest editProfileRequest) throws IOException {
         SecurityUser securityUser = (SecurityUser)
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal();
-        contentType = contentType.replaceAll(";.+", "");
-        switch (contentType) {
-            case "multipart/form-data":
-                return ResponseEntity.ok(
-                        authCheckService
-                                .editProfileWithPhoto(securityUser.getUserId(), editProfileRequest));
-            case "application/json":
-                return ResponseEntity.ok(
-                        authCheckService
-                                .editProfileWithoutPhoto(securityUser.getUserId(), editProfileRequest));
-            default:
-                return ResponseEntity.ok(new ResponseWithErrors(false, null));
-        }
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(authCheckService
+                .editProfile(securityUser.getUserId(), editProfileRequest));
     }
 
 
+    @PostMapping(value = "/api/profile/my", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<ResponseWithErrors> editProfile(
+            @RequestBody EditProfileRequest editProfileRequest) throws IOException {
+        SecurityUser securityUser = (SecurityUser)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(authCheckService.editProfile(
+                securityUser.getUserId(),
+                editProfileRequest));
+    }
 }

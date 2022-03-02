@@ -5,6 +5,7 @@ import com.github.cage.GCage;
 import main.api.request.EditProfileRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.ResponseWithErrors;
+import main.dto.ErrorsForAddingPost;
 import main.dto.ErrorsForProfile;
 import main.dto.UserForRegistrationDTO;
 import main.model.CaptchaCode;
@@ -18,9 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -99,9 +98,9 @@ public class AuthCheckService {
 //    public ResponseWithErrors postImage(MultipartFile photo){
 //    }
 
-    public ResponseWithErrors editProfileWithPhoto(int userId, EditProfileRequest editProfileRequest)
+
+    public ResponseWithErrors editProfile(int userId, EditProfileRequest editProfileRequest)
             throws IOException {
-
         Map<String, String> errors = new HashMap<>();
         User user = userRepository.findById(userId).get();
 
@@ -114,38 +113,23 @@ public class AuthCheckService {
         user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
                 ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
 
-//        String photoPath = savePhoto(editProfileRequest.getPhoto(), true);
 
-        String oldPhoto = user.getPhoto();
+        if (editProfileRequest.getPhoto() != null) {
+            String photoPath = savePhoto(editProfileRequest.getPhoto(), true);
 
-        File oldPhotoFile = new File(oldPhoto);
+            if (photoPath.length() == 0) {
+                errors.put("photo", ErrorsForProfile.photo);
+            }
 
-        if (oldPhotoFile.exists()) {
-            oldPhotoFile.delete();
+            File oldPhotoFile = user.getPhoto() == null ? null : new File(user.getPhoto());
+
+            user.setPhoto(photoPath.isEmpty() ? null : photoPath);
+
+            if (oldPhotoFile != null
+                    && Files.exists(oldPhotoFile.toPath())) {
+                System.out.println(oldPhotoFile.delete());
+            }
         }
-
-//        user.setPhoto(photoPath.isEmpty() ? null : photoPath);
-
-        if (errors.isEmpty()) {
-            userRepository.save(user);
-            return new ResponseWithErrors(true, null);
-        }
-        return new ResponseWithErrors(false, errors);
-    }
-
-    public ResponseWithErrors editProfileWithoutPhoto(int userId, EditProfileRequest editProfileRequest) {
-        Map<String, String> errors = new HashMap<>();
-        User user = userRepository.findById(userId).get();
-
-        user.setEmail(isEmailValid(editProfileRequest.getEmail(), user.getEmail(), errors)
-                ? editProfileRequest.getEmail() : user.getEmail());
-
-        user.setName(isNameCorrect(editProfileRequest.getName(), errors)
-                ? editProfileRequest.getName() : user.getName());
-
-        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
-                ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
-
 
         if (editProfileRequest.getRemovePhoto() != null && editProfileRequest.getRemovePhoto()) {
             user.setPhoto(null);
@@ -211,6 +195,13 @@ public class AuthCheckService {
 
         if (photo != null) {
             StringBuilder photoPath = new StringBuilder(root.toString());
+            String originalPhotoName = photo.getOriginalFilename();
+            String photoFormat = originalPhotoName.substring(originalPhotoName.lastIndexOf(".") + 1);
+            originalPhotoName = originalPhotoName.substring(0, originalPhotoName.lastIndexOf("."));
+            if (!(photoFormat.equals("jpg") || photoFormat.equals("png"))) {
+                return "";
+            }
+
             for (int i = 0; i < 3; i++) {
                 String dirName = "/" + RandomStringUtils.randomAlphanumeric(2).toLowerCase();
                 File dir = new File(photoPath.append(dirName).toString());
@@ -222,9 +213,9 @@ public class AuthCheckService {
             if (userPhoto) {
                 userImage = userImage.getSubimage(0, 0, 36, 36);
             }
-            photoPath.append("/").append(photo.getOriginalFilename());
+            photoPath.append("/").append(UUID.randomUUID().toString()).append(originalPhotoName);
             File file = new File(photoPath.toString());
-            ImageIO.write(userImage, "jpg", file);
+            ImageIO.write(userImage, photoFormat, file);
             return "/" + photoPath.toString();
         }
         return "";
