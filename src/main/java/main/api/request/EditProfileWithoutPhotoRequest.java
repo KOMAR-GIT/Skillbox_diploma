@@ -1,28 +1,20 @@
 package main.api.request;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.multipart.MultipartFile;
-
-public class EditProfileRequest {
+public class EditProfileWithoutPhotoRequest {
 
     private String name;
     private String email;
     private String password;
     private Boolean removePhoto;
-    @Autowired
-    private MultipartFile photo;
 
-    public EditProfileRequest() {
-        photo = null;
-    }
-
-    public EditProfileRequest(String name, String email, String password, Boolean removePhoto, MultipartFile photo) {
+    public EditProfileWithoutPhotoRequest(String name, String email, String password, Boolean removePhoto) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.removePhoto = removePhoto;
-        this.photo = photo;
+    }
+
+    public EditProfileWithoutPhotoRequest() {
     }
 
     public String getName() {
@@ -55,13 +47,5 @@ public class EditProfileRequest {
 
     public void setRemovePhoto(Boolean removePhoto) {
         this.removePhoto = removePhoto;
-    }
-
-    public MultipartFile getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(MultipartFile photo) {
-        this.photo = photo;
     }
 }

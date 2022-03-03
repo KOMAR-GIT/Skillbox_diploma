@@ -3,7 +3,9 @@ package main.service;
 import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.api.request.EditProfileRequest;
+import main.api.request.EditProfileWithoutPhotoRequest;
 import main.api.response.CaptchaResponse;
+import main.api.response.PostImageResponse;
 import main.api.response.ResponseWithErrors;
 import main.dto.ErrorsForAddingPost;
 import main.dto.ErrorsForProfile;
@@ -95,9 +97,17 @@ public class AuthCheckService {
         return new ResponseWithErrors(false, errors);
     }
 
-//    public ResponseWithErrors postImage(MultipartFile photo){
-//    }
-
+    public PostImageResponse postImage(MultipartFile photo) throws IOException {
+        Map<String, String> errors = new HashMap<>();
+        if (photo != null) {
+            String photoPath = savePhoto(photo, false);
+            if(photoPath.length() != 0){
+                return new PostImageResponse(true, null, photoPath);
+            }
+        }
+        errors.put("image", ErrorsForProfile.photo);
+        return new PostImageResponse(false, errors, null);
+    }
 
     public ResponseWithErrors editProfile(int userId, EditProfileRequest editProfileRequest)
             throws IOException {
@@ -121,18 +131,60 @@ public class AuthCheckService {
                 errors.put("photo", ErrorsForProfile.photo);
             }
 
-            File oldPhotoFile = user.getPhoto() == null ? null : new File(user.getPhoto());
+            File oldPhotoFile = user.getPhoto() == null ? null : new File(user.getPhoto().substring(1));
 
             user.setPhoto(photoPath.isEmpty() ? null : photoPath);
 
             if (oldPhotoFile != null
                     && Files.exists(oldPhotoFile.toPath())) {
-                System.out.println(oldPhotoFile.delete());
+                oldPhotoFile.delete();
             }
         }
 
+        if (errors.isEmpty()) {
+            userRepository.save(user);
+            List authorities = new ArrayList();
+            authorities.addAll(user.getRole().getAuthorities());
+            SecurityUser securityUser = new SecurityUser(
+                    user.getEmail(),
+                    user.getPassword(),
+                    userId,
+                    authorities);
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            securityUser,
+                            securityUser.getPassword(),
+                            securityUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return new ResponseWithErrors(true, null);
+        }
+        return new ResponseWithErrors(false, errors);
+    }
+
+
+    public ResponseWithErrors editProfile(int userId, EditProfileWithoutPhotoRequest editProfileRequest)
+            throws IOException {
+        Map<String, String> errors = new HashMap<>();
+        User user = userRepository.findById(userId).get();
+
+        user.setEmail(isEmailValid(editProfileRequest.getEmail(), user.getEmail(), errors)
+                ? editProfileRequest.getEmail() : user.getEmail());
+
+        user.setName(isNameCorrect(editProfileRequest.getName(), errors)
+                ? editProfileRequest.getName() : user.getName());
+
+        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
+                ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
+
         if (editProfileRequest.getRemovePhoto() != null && editProfileRequest.getRemovePhoto()) {
+            File oldPhotoFile = user.getPhoto() == null ? null : new File(user.getPhoto().substring(1));
+
+            if (oldPhotoFile != null
+                    && Files.exists(oldPhotoFile.toPath())) {
+                oldPhotoFile.delete();
+            }
             user.setPhoto(null);
+
         }
 
         if (errors.isEmpty()) {
@@ -216,7 +268,8 @@ public class AuthCheckService {
             photoPath.append("/").append(UUID.randomUUID().toString()).append(originalPhotoName);
             File file = new File(photoPath.toString());
             ImageIO.write(userImage, photoFormat, file);
-            return "/" + photoPath.toString();
+            photoPath.insert(0,"/");
+            return photoPath.toString();
         }
         return "";
     }

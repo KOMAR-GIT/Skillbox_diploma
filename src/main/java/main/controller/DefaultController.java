@@ -41,18 +41,6 @@ public class DefaultController {
         return "index";
     }
 
-
-    @PostMapping("/api/image")
-    public ResponseEntity<ResponseWithErrors> uploadImage(@RequestParam("image") MultipartFile file) {
-
-        if (file != null) {
-            file.getName();
-        }
-
-        ResponseWithErrors responseWithErrors = new ResponseWithErrors();
-        return ResponseEntity.ok(responseWithErrors);
-    }
-
     @GetMapping("/api/statistics/my")
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<StatisticResponse> userStatistics() {

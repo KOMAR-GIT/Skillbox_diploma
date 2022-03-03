@@ -1,6 +1,7 @@
 package main.controller;
 
 import main.api.request.EditProfileRequest;
+import main.api.request.EditProfileWithoutPhotoRequest;
 import main.api.request.LoginRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
@@ -80,9 +81,6 @@ public class ApiAuthController {
         return ResponseEntity.ok(new SuccessResultResponse(true));
     }
 
-
-    //не удаляются старые фотки
-
     @PostMapping(value = "/api/profile/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResponseWithErrors> editProfileWithPhoto(
@@ -97,7 +95,7 @@ public class ApiAuthController {
     @PostMapping(value = "/api/profile/my", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResponseWithErrors> editProfile(
-            @RequestBody EditProfileRequest editProfileRequest) throws IOException {
+            @RequestBody EditProfileWithoutPhotoRequest editProfileRequest) throws IOException {
         SecurityUser securityUser = (SecurityUser)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(authCheckService.editProfile(

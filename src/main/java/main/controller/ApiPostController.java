@@ -11,11 +11,14 @@ import main.security.SecurityUser;
 import main.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +31,19 @@ public class ApiPostController {
     private final TagsService tagsService;
     private final ModelMapper modelMapper;
     private final PostVotesService postVotesService;
+    private final AuthCheckService authCheckService;
 
-    public ApiPostController(PostsService postsService, PostCommentsService postCommentsService, TagsService tagsService, ModelMapper modelMapper, PostVotesService postVotesService) {
+    public ApiPostController(PostsService postsService,
+                             PostCommentsService postCommentsService,
+                             TagsService tagsService,
+                             ModelMapper modelMapper,
+                             PostVotesService postVotesService, AuthCheckService authCheckService) {
         this.postsService = postsService;
         this.postCommentsService = postCommentsService;
         this.tagsService = tagsService;
         this.modelMapper = modelMapper;
         this.postVotesService = postVotesService;
+        this.authCheckService = authCheckService;
     }
 
 
@@ -124,6 +133,16 @@ public class ApiPostController {
     public ResponseEntity<ResponseWithErrors> addPost(@RequestBody AddAndEditPostDTO addAndEditPostDTO) {
         ResponseWithErrors responseWithErrors = postsService.addPost(addAndEditPostDTO);
         return ResponseEntity.ok(responseWithErrors);
+    }
+
+    @PostMapping(value = "/api/image")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<?> postImage(@RequestParam("image") MultipartFile photo) throws IOException {
+        PostImageResponse response = authCheckService.postImage(photo);
+        if(response.isResult()){
+            return ResponseEntity.ok(response.getPath());
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/api/post/{id}")

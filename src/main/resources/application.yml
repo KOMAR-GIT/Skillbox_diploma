@@ -28,6 +28,7 @@ logging:
               BasicBinder:
                 TRACE
 
+
 blog:
   title: DevPub
   subtitle: Рассказы разработчиков
