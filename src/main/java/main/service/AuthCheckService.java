@@ -2,12 +2,12 @@ package main.service;
 
 import com.github.cage.Cage;
 import com.github.cage.GCage;
+import main.api.request.ChangePasswordRequest;
 import main.api.request.EditProfileRequest;
 import main.api.request.EditProfileWithoutPhotoRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.PostImageResponse;
 import main.api.response.ResponseWithErrors;
-import main.dto.ErrorsForAddingPost;
 import main.dto.ErrorsForProfile;
 import main.dto.UserForRegistrationDTO;
 import main.model.CaptchaCode;
@@ -17,8 +17,8 @@ import main.repository.UserRepository;
 import main.security.SecurityUser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,17 +47,21 @@ public class AuthCheckService {
     private String uploadPath;
     private final CaptchaCodeRepository captchaCodeRepository;
     private final UserRepository userRepository;
-    private final AuthenticationManager authenticationManager;
-
+    private final DefaultEmailService defaultEmailService;
+    private final ServletWebServerApplicationContext webServerAppContext;
 
     private final PasswordEncoder passwordEncoder;
 
 
-    public AuthCheckService(CaptchaCodeRepository captchaCodeRepository, UserRepository userRepository,
-                            AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public AuthCheckService(CaptchaCodeRepository captchaCodeRepository,
+                            UserRepository userRepository,
+                            DefaultEmailService defaultEmailService,
+                            ServletWebServerApplicationContext webServerAppContext,
+                            PasswordEncoder passwordEncoder) {
         this.captchaCodeRepository = captchaCodeRepository;
         this.userRepository = userRepository;
-        this.authenticationManager = authenticationManager;
+        this.defaultEmailService = defaultEmailService;
+        this.webServerAppContext = webServerAppContext;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -80,8 +87,8 @@ public class AuthCheckService {
         Map<String, String> errors = new HashMap<>();
         isEmailValid(userDTO.getEmail(), "", errors);
         isNameCorrect(userDTO.getName(), errors);
-        isPasswordCorrect(userDTO.getPassword(), "", errors);
-        isCaptchaCorrect(userDTO.getCaptchaSecret(), errors);
+        isPasswordCorrect(userDTO.getPassword(), errors);
+        isCaptchaCorrect(userDTO.getCaptchaSecret(), userDTO.getCaptcha(), errors);
 
         if (errors.isEmpty()) {
             User user = new User(false,
@@ -101,7 +108,7 @@ public class AuthCheckService {
         Map<String, String> errors = new HashMap<>();
         if (photo != null) {
             String photoPath = savePhoto(photo, false);
-            if(photoPath.length() != 0){
+            if (photoPath.length() != 0) {
                 return new PostImageResponse(true, null, photoPath);
             }
         }
@@ -120,7 +127,7 @@ public class AuthCheckService {
         user.setName(isNameCorrect(editProfileRequest.getName(), errors)
                 ? editProfileRequest.getName() : user.getName());
 
-        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
+        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), errors)
                 ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
 
 
@@ -162,8 +169,7 @@ public class AuthCheckService {
     }
 
 
-    public ResponseWithErrors editProfile(int userId, EditProfileWithoutPhotoRequest editProfileRequest)
-            throws IOException {
+    public ResponseWithErrors editProfile(int userId, EditProfileWithoutPhotoRequest editProfileRequest) {
         Map<String, String> errors = new HashMap<>();
         User user = userRepository.findById(userId).get();
 
@@ -173,7 +179,7 @@ public class AuthCheckService {
         user.setName(isNameCorrect(editProfileRequest.getName(), errors)
                 ? editProfileRequest.getName() : user.getName());
 
-        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), user.getPassword(), errors)
+        user.setPassword(isPasswordCorrect(editProfileRequest.getPassword(), errors)
                 ? passwordEncoder.encode(editProfileRequest.getPassword()) : user.getPassword());
 
         if (editProfileRequest.getRemovePhoto() != null && editProfileRequest.getRemovePhoto()) {
@@ -208,6 +214,49 @@ public class AuthCheckService {
     }
 
 
+    public Boolean restore(String email, HttpServletRequest request) throws MalformedURLException {
+        User user = userRepository.getByEmail(email);
+        if (user != null) {
+            String hash = UUID.randomUUID().toString();
+            URL url = new URL(request.getRequestURL().toString());
+            int port = webServerAppContext.getWebServer().getPort();
+            StringBuilder message = new StringBuilder("Перейдите по ссылке для восстановления пароля: "
+                    + url.getProtocol() + "://" + url.getHost() + ":" + port + "/login/change-password/");
+            message.append(hash);
+
+            try {
+                defaultEmailService.sendSimpleEmail(email, "Восстановление пароля", message.toString());
+            } catch (Exception e) {
+                return false;
+            }
+
+            user.setCode(hash);
+            userRepository.save(user);
+
+            return true;
+        }
+        return false;
+    }
+
+    public ResponseWithErrors changePassword(ChangePasswordRequest changePasswordRequest) {
+        Map<String, String> errors = new HashMap<>();
+        User user = userRepository.findByCode(changePasswordRequest.getCode());
+        if (user != null) {
+            isPasswordCorrect(changePasswordRequest.getPassword(), errors);
+            isCaptchaCorrect(
+                    changePasswordRequest.getCaptcha_secret(),
+                    changePasswordRequest.getCaptcha(),
+                    errors);
+
+            if (errors.isEmpty()) {
+                user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+                userRepository.save(user);
+                return new ResponseWithErrors(true, null);
+            }
+        }
+        return new ResponseWithErrors(false, errors);
+    }
+
     private boolean isEmailValid(String newEmail, String oldEmail, Map<String, String> map) {
         if (newEmail == null
                 || (!newEmail.equals(oldEmail) && userRepository.getByEmail(newEmail) != null)) {
@@ -225,16 +274,16 @@ public class AuthCheckService {
         return true;
     }
 
-    private boolean isPasswordCorrect(String newPassword, String oldPassword, Map<String, String> map) {
-        if ((newPassword != null && newPassword.length() < 6)
-                || passwordEncoder.matches(oldPassword, newPassword)) {
+    private boolean isPasswordCorrect(String newPassword, Map<String, String> map) {
+        if ((newPassword != null && newPassword.length() < 6)) {
             map.put("password", ErrorsForProfile.password);
             return false;
         } else return newPassword != null;
     }
 
-    private void isCaptchaCorrect(String secret, Map<String, String> map) {
-        if (!checkCaptcha(secret)) {
+    private void isCaptchaCorrect(String secret, String code, Map<String, String> map) {
+        CaptchaCode captchaCode = captchaCodeRepository.findBySecretCode(secret);
+        if (captchaCode == null || !captchaCode.getCode().equals(code)) {
             map.put("captcha", ErrorsForProfile.captcha);
         }
     }
@@ -265,12 +314,18 @@ public class AuthCheckService {
             if (userPhoto) {
                 userImage = userImage.getSubimage(0, 0, 36, 36);
             }
-            photoPath.append("/").append(UUID.randomUUID().toString()).append(originalPhotoName);
+            photoPath.append("/")
+                    .append(UUID.randomUUID().toString())
+                    .append(originalPhotoName)
+                    .append(".")
+                    .append(photoFormat);
             File file = new File(photoPath.toString());
             ImageIO.write(userImage, photoFormat, file);
-            photoPath.insert(0,"/");
+            photoPath.insert(0, "/");
             return photoPath.toString();
         }
         return "";
     }
 }
+
+

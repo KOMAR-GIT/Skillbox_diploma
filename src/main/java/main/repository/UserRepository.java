@@ -13,4 +13,6 @@ public interface UserRepository extends CrudRepository<User, Integer> {
     @Query(value = "SELECT * FROM users where email = :email", nativeQuery = true)
     User getByEmail(@Param("email") String email);
 
+    User findByCode(String code);
+
 }

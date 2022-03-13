@@ -1,16 +1,16 @@
 package main.controller;
 
-import main.api.request.EditProfileRequest;
-import main.api.request.EditProfileWithoutPhotoRequest;
-import main.api.request.LoginRequest;
-import main.api.response.CaptchaResponse;
-import main.api.response.LoginResponse;
-import main.api.response.ResponseWithErrors;
-import main.api.response.SuccessResultResponse;
+import main.api.request.*;
+import main.api.response.*;
+import main.dto.GlobalSettingsCodes;
 import main.dto.UserForRegistrationDTO;
+import main.dto.interfaces.StatisticsInterface;
 import main.security.SecurityUser;
 import main.service.AuthCheckService;
+import main.service.SettingsService;
+import main.service.StatisticsService;
 import main.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.security.Principal;
 
 @RestController
@@ -32,13 +34,22 @@ public class ApiAuthController {
     private final AuthenticationManager authenticationManager;
 
     private final UserService userService;
+    private final StatisticsService statisticsService;
+    private final SettingsService settingsService;
+    private final ModelMapper modelMapper;
 
     public ApiAuthController(AuthCheckService authCheckService,
                              AuthenticationManager authenticationManager,
-                             UserService userService) {
+                             UserService userService,
+                             StatisticsService statisticsService,
+                             SettingsService settingsService,
+                             ModelMapper modelMapper) {
         this.authCheckService = authCheckService;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.statisticsService = statisticsService;
+        this.settingsService = settingsService;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("/api/auth/check")
@@ -95,11 +106,46 @@ public class ApiAuthController {
     @PostMapping(value = "/api/profile/my", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResponseWithErrors> editProfile(
-            @RequestBody EditProfileWithoutPhotoRequest editProfileRequest) throws IOException {
+            @RequestBody EditProfileWithoutPhotoRequest editProfileRequest) {
         SecurityUser securityUser = (SecurityUser)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(authCheckService.editProfile(
                 securityUser.getUserId(),
                 editProfileRequest));
     }
+
+    @GetMapping("/api/statistics/my")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<StatisticResponse> userStatistics() {
+        StatisticsInterface statisticsInterface = statisticsService.getUserStatistics();
+        StatisticResponse statisticResponse = modelMapper.map(statisticsInterface, StatisticResponse.class);
+        statisticResponse.setFirstPublication(statisticResponse.getFirstPublication() / 1000);
+        return ResponseEntity.ok(statisticResponse);
+    }
+
+    @GetMapping("/api/statistics/all")
+    public ResponseEntity<StatisticResponse> globalStatistics() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        SecurityUser securityUser = auth.getName().equals("anonymousUser")
+                ? null : (SecurityUser) auth.getPrincipal();
+        if (settingsService.getOneSetting(GlobalSettingsCodes.STATISTICS_IS_PUBLIC) ||
+                securityUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("user:moderate"))) {
+            StatisticsInterface statisticsInterface = statisticsService.getGlobalStatistics();
+            StatisticResponse statisticResponse = modelMapper.map(statisticsInterface, StatisticResponse.class);
+            statisticResponse.setFirstPublication(statisticResponse.getFirstPublication() / 1000);
+            return ResponseEntity.ok(statisticResponse);
+        }
+        return ResponseEntity.status(401).body(null);
+    }
+
+    @PostMapping("/api/auth/restore")
+    public ResponseEntity<?> restorePassword(@RequestBody RestoreRequest restoreRequest, HttpServletRequest request) throws MalformedURLException {
+        return ResponseEntity.ok(authCheckService.restore(restoreRequest.getEmail(), request));
+    }
+
+    @PostMapping("/api/auth/password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+        return ResponseEntity.ok(authCheckService.changePassword(changePasswordRequest));
+    }
+
 }
