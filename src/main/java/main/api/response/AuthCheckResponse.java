@@ -1,8 +1,10 @@
 package main.api.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import main.dto.UserDTO;
 import org.springframework.stereotype.Component;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Component
 public class AuthCheckResponse {
 

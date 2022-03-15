@@ -1,21 +1,23 @@
 package main.api.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Component
-public class RegisterResponse {
+public class ResponseWithErrors {
 
-    private boolean result;
+    private Boolean result;
     private Map<String,String> errors;
 
-    public RegisterResponse() {
+    public ResponseWithErrors() {
     }
 
-    public RegisterResponse(Map<String, String> errors) {
+    public ResponseWithErrors(boolean result ,Map<String, String> errors) {
         this.errors = errors;
-        result = errors == null;
+        this.result = result;
     }
 
     public boolean isResult() {

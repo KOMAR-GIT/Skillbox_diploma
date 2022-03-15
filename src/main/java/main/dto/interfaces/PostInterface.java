@@ -1,5 +1,7 @@
 package main.dto.interfaces;
 
+import main.model.enums.ModerationStatus;
+
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
@@ -15,4 +17,5 @@ public interface PostInterface {
     BigInteger getLikeCount();
     BigInteger getDislikeCount();
     Integer getViewCount();
+    ModerationStatus getModerationStatus();
 }

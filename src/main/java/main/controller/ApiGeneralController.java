@@ -7,7 +7,6 @@ import main.api.response.TagResponse;
 import main.dto.TagDTO;
 import main.dto.interfaces.TagInterface;
 import main.service.CalendarService;
-import main.service.PostsService;
 import main.service.SettingsService;
 import main.service.TagsService;
 import org.modelmapper.ModelMapper;
@@ -31,28 +30,25 @@ public class ApiGeneralController {
 
     private final TagsService tagsService;
 
-    private final PostsService postsService;
-
     private final CalendarService calendarService;
 
     public ApiGeneralController(SettingsService settingsService,
                                 InitResponse initResponse,
                                 ModelMapper modelMapper,
                                 TagsService tagsService,
-                                PostsService postsService, CalendarService calendarService)
+                                CalendarService calendarService)
     {
         this.settingsService = settingsService;
         this.initResponse = initResponse;
         this.modelMapper = modelMapper;
         this.tagsService = tagsService;
-        this.postsService = postsService;
         this.calendarService = calendarService;
     }
 
 
     @GetMapping("/api/settings")
     public SettingsResponse settings() {
-        return settingsService.getGlobalSettings();
+        return settingsService.getAllGlobalSettings();
     }
 
     @GetMapping("/api/init")
@@ -74,8 +70,6 @@ public class ApiGeneralController {
         CalendarResponse calendarResponse = new CalendarResponse(calendarService.getYears() , calendarService.getPostsCountByYear(year));
         return new ResponseEntity<>(calendarResponse, HttpStatus.OK);
     }
-
-
 
 
     private TagDTO convertTagToTagDTO(TagInterface tagInterface) {

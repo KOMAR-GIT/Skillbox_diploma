@@ -3,14 +3,14 @@ package main.api.response;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LogoutResponse {
+public class SuccessResultResponse {
 
     private boolean result;
 
-    public LogoutResponse() {
+    public SuccessResultResponse() {
     }
 
-    public LogoutResponse(boolean result) {
+    public SuccessResultResponse(boolean result) {
         this.result = result;
     }
 

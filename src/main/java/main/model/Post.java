@@ -43,7 +43,7 @@ import java.util.Date;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "is_active", columnDefinition = "tinyint", nullable = false)
@@ -76,7 +76,9 @@ public class Post {
     public Post() {
     }
 
-
+    public Post(Integer id) {
+        this.id = id;
+    }
 
     public Integer getId() {
         return id;

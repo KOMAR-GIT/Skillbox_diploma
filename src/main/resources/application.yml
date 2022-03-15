@@ -1,3 +1,7 @@
+server:
+  error:
+    whitelable:
+      enabled: false
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/blogengine?serverTimezone=UTC
@@ -10,6 +14,19 @@ spring:
       dialect: org.hibernate.dialect.MySQL5Dialect
       ddl-auto: none
 
+  mail:
+    host: smtp.google.com
+    username: bogdankomarov.bk@gmail.com
+    password: 
+    properties:
+      mail:
+        debug: true
+        smtp:
+          port: 25
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
   flyway:
     enabled: true
@@ -18,7 +35,16 @@ spring:
 
 logging:
   level:
-    sql: debug
+    org:
+      hibernate:
+        SQL:
+          TRACE
+        type:
+          descriptor:
+            sql:
+              BasicBinder:
+                TRACE
+
 
 blog:
   title: DevPub
@@ -29,3 +55,5 @@ blog:
   copyrightFrom: 2021
 captcha:
   lifetimeInMinutes: 3600
+upload:
+  path: upload/

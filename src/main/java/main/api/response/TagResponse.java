@@ -1,9 +1,11 @@
 package main.api.response;
 
 import main.dto.TagDTO;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class TagResponse {
 
     private List<TagDTO> tags;

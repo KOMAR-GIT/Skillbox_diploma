@@ -15,5 +15,6 @@ public interface GlobalSettingsRepository extends CrudRepository<GlobalSetting, 
     @Query(value = "SELECT * FROM global_settings", nativeQuery = true)
     List<GlobalSettingsInterface> getSettings();
 
+    GlobalSetting findByCode(String code);
 
 }

@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Tag2Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
@@ -19,6 +19,11 @@ public class Tag2Post {
     private Tag tagId;
 
     public Tag2Post() {
+    }
+
+    public Tag2Post(Post postId, Tag tagId) {
+        this.postId = postId;
+        this.tagId = tagId;
     }
 
     public Integer getId() {

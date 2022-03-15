@@ -1,7 +1,6 @@
 package main.repository.DAO;
 
 import main.repository.DAO.builder.PostQueryBuilder;
-import main.service.PostOutputMode;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -20,14 +19,25 @@ public class PostDAO {
 
     public List getPosts(PostQueryBuilder postQueryBuilder) {
 
-        Query query = postQueryBuilder.build(entityManager, false);
+        Query query = postQueryBuilder
+                .where(" is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= curdate() ")
+                .build(entityManager);
 
         return query.getResultList();
     }
 
-    public List getPostsForModerationOrUserPosts(PostQueryBuilder postQueryBuilder) {
+    public List getPostsForUser(PostQueryBuilder postQueryBuilder) {
 
-        Query query = postQueryBuilder.build(entityManager, true);
+        Query query = postQueryBuilder.build(entityManager);
+
+        return query.getResultList();
+    }
+
+    public List getPostsForModerator(PostQueryBuilder postQueryBuilder) {
+
+        Query query = postQueryBuilder
+                .where(" is_active = 1")
+                .build(entityManager);
 
         return query.getResultList();
     }

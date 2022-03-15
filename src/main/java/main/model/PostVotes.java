@@ -8,7 +8,7 @@ import java.util.Date;
 public class PostVotes {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
@@ -26,6 +26,13 @@ public class PostVotes {
     private Boolean value;
 
     public PostVotes() {
+    }
+
+    public PostVotes(Post post, User user, Date time, Boolean value) {
+        this.post = post;
+        this.user = user;
+        this.time = time;
+        this.value = value;
     }
 
     public Integer getId() {
