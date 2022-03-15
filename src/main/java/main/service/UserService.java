@@ -2,6 +2,7 @@ package main.service;
 
 import main.api.response.LoginResponse;
 import main.dto.UserDTO;
+import main.dto.interfaces.UserInterface;
 import main.model.User;
 import main.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -24,14 +25,15 @@ public class UserService {
     }
 
     public LoginResponse getLoginResponse(String email){
-        main.model.User currentUser =
-                userRepository.getByEmail(email);
+        UserInterface currentUser = userRepository.getByEmail(email);
         if(currentUser == null) {
             return new LoginResponse();
         }
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setResult(true);
-        loginResponse.setUser(modelMapper.map(currentUser, UserDTO.class));
+        UserDTO userDTO = modelMapper.map(currentUser, UserDTO.class);
+        loginResponse.setUser(userDTO);
+        loginResponse.getUser().setSettings(true);
         return loginResponse;
     }
 

@@ -1,14 +1,34 @@
 package main.dto;
 
+import java.math.BigInteger;
+
 public class UserDTO {
 
     private Integer id;
     private String name;
     private String photo;
     private String email;
-    private Boolean moderation;
-    private Integer moderationCount;
+    private Byte moderation;
+    private BigInteger moderationCount;
     private Boolean settings;
+
+    public UserDTO() {
+    }
+
+    public UserDTO(Integer id,
+                   String name,
+                   String photo,
+                   String email,
+                   Byte moderation,
+                   BigInteger moderationCount) {
+        this.id = id;
+        this.name = name;
+        this.photo = photo;
+        this.email = email;
+        this.moderation = moderation;
+        this.moderationCount = moderationCount;
+        settings = moderation == 1;
+    }
 
     public Integer getId() {
         return id;
@@ -42,20 +62,24 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Boolean isModeration() {
+    public Byte getModeration() {
         return moderation;
     }
 
-    public void setModeration(Boolean moderation) {
+    public void setModeration(Byte moderation) {
         this.moderation = moderation;
     }
 
-    public Integer getModerationCount() {
+    public BigInteger getModerationCount() {
         return moderationCount;
     }
 
-    public void setModerationCount(Integer moderationCount) {
+    public void setModerationCount(BigInteger moderationCount) {
         this.moderationCount = moderationCount;
+    }
+
+    public Boolean getSettings() {
+        return settings;
     }
 
     public Boolean isSettings() {

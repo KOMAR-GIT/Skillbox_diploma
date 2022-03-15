@@ -215,7 +215,7 @@ public class AuthCheckService {
 
 
     public Boolean restore(String email, HttpServletRequest request) throws MalformedURLException {
-        User user = userRepository.getByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user != null) {
             String hash = UUID.randomUUID().toString();
             URL url = new URL(request.getRequestURL().toString());
@@ -297,6 +297,7 @@ public class AuthCheckService {
         if (photo != null) {
             StringBuilder photoPath = new StringBuilder(root.toString());
             String originalPhotoName = photo.getOriginalFilename();
+            assert originalPhotoName != null;
             String photoFormat = originalPhotoName.substring(originalPhotoName.lastIndexOf(".") + 1);
             originalPhotoName = originalPhotoName.substring(0, originalPhotoName.lastIndexOf("."));
             if (!(photoFormat.equals("jpg") || photoFormat.equals("png"))) {

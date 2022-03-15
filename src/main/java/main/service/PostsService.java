@@ -1,5 +1,6 @@
 package main.service;
 
+import main.api.request.ModerationDecisionRequest;
 import main.api.response.PostsResponse;
 import main.api.response.ResponseWithErrors;
 import main.dto.AddAndEditPostDTO;
@@ -8,6 +9,7 @@ import main.dto.interfaces.PostInterface;
 import main.model.Post;
 import main.model.Tag;
 import main.model.Tag2Post;
+import main.model.User;
 import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
 import main.repository.DAO.PostDAO;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -49,11 +50,40 @@ public class PostsService {
         this.modelMapper = modelMapper;
     }
 
-    public List getPostsForModeration(int offset, int limit) {
-        return postDAO.getPostsForModerationOrUserPosts(new PostQueryBuilder(offset, limit));
+    public List getPostsForModeration(int offset, int limit, ModerationStatus status) {
+        return postDAO.getPostsForModerator(
+                new PostQueryBuilder(offset, limit).where(" p.moderation_status = \"" + status + "\""));
     }
 
-    public Post findPostById(int id){return postRepository.findById(id).orElse(null);};
+    public boolean getModerationDecision(ModerationDecisionRequest request) {
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
+        if (post != null) {
+
+            switch (request.getDecision()) {
+                case "accept":
+                    post.setModerationStatus(ModerationStatus.ACCEPTED);
+                    break;
+                case "decline":
+                    post.setModerationStatus(ModerationStatus.DECLINED);
+                    break;
+                default:
+                    return false;
+            }
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
+            User user = new User();
+            user.setId(securityUser.getUserId());
+            post.setUser(user);
+            postRepository.save(post);
+            return true;
+        }
+        return false;
+    }
+
+    public Post findPostById(int id) {
+        return postRepository.findById(id).orElse(null);
+    }
 
     public List getPostsByMode(int offset, int limit, PostOutputMode mode) {
         String sortMode;
@@ -99,7 +129,13 @@ public class PostsService {
         PostQueryBuilder postQueryBuilder = new PostQueryBuilder(offset, limit);
         if (!tag.isEmpty()) {
             postQueryBuilder
-                    .where(" p.id in (select post_id from tag2post join tags t on tag_id = t.id where t.name = :tag) ")
+                    .where(" p.id in " +
+                            "   (select " +
+                            "       post_id " +
+                            "    from " +
+                            "       tag2post " +
+                            "    join tags t on tag_id = t.id " +
+                            "    where t.name = :tag) ")
                     .parameter("tag", tag);
         }
         return postDAO.getPosts(postQueryBuilder);
@@ -131,22 +167,30 @@ public class PostsService {
         SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
         postQueryBuilder.where(" u.id = " + securityUser.getUserId());
         return new PostsResponse(postRepository.getUserPostsCount(countFilterQuery),
-                postDAO.getPostsForModerationOrUserPosts(postQueryBuilder));
+                postDAO.getPostsForUser(postQueryBuilder));
     }
 
 
     public PostInterface getPostById(int id) {
         PostInterface post = postRepository.getPostById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        SecurityUser securityUser = auth.getName().equals("anonymousUser")
-                ? null
+        boolean isAnonymous = auth.getName().equals("anonymousUser");
+
+        SecurityUser securityUser = isAnonymous ? null
                 : (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        boolean isModerator = !isAnonymous && securityUser
+                .getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("user:moderate"));
 
         if (securityUser == null
                 || !securityUser.getUserId().equals(post.getUserId())
-                || securityUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("user:moderate"))) {
+                || isModerator) {
             if (post.getActive() == 1 && post.getModerationStatus() == ModerationStatus.ACCEPTED
                     && post.getTimestamp().getTime() <= Calendar.getInstance().getTime().getTime()) {
+                return post;
+            } else if (post.getActive() == 1 && isModerator) {
                 return post;
             } else {
                 return null;
@@ -161,9 +205,14 @@ public class PostsService {
         if (!auth.getName().equals("anonymousUser")) {
             SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
             if (!securityUser.getUserId().equals(post.getUserId())
-                    && securityUser.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
+                    && securityUser
+                    .getAuthorities()
+                    .stream()
+                    .noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
                 postRepository.increasePostViewsCount(post.getId());
             }
+        }else{
+            postRepository.increasePostViewsCount(post.getId());
         }
     }
 
@@ -181,7 +230,11 @@ public class PostsService {
             post.setText(addAndEditPostDTO.getText());
             post.setViewCount(0);
 
-            SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            SecurityUser securityUser = (SecurityUser)
+                    SecurityContextHolder
+                            .getContext()
+                            .getAuthentication()
+                            .getPrincipal();
             post.setUser(userService.getUserById(securityUser.getUserId()));
 
             if (addAndEditPostDTO.getTimestamp() < System.currentTimeMillis() / 1000) {
@@ -206,14 +259,25 @@ public class PostsService {
         if (errors.size() == 0) {
             PostInterface postInterface = postRepository.getPostById(id);
             Post post = modelMapper.map(postInterface, Post.class);
-            post.setActive(addAndEditPostDTO.isActive());
-            post.setModerationStatus(ModerationStatus.NEW);
+
+            SecurityUser securityUser = (SecurityUser)
+                    SecurityContextHolder
+                            .getContext()
+                            .getAuthentication()
+                            .getPrincipal();
+            post.setUser(userService.getUserById(securityUser.getUserId()));
+
+            boolean isModerator = securityUser
+                    .getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority().equals("user:moderate"));
+
+            post.setActive(isModerator ? post.isActive() : addAndEditPostDTO.isActive());
             post.setTitle(addAndEditPostDTO.getTitle());
             post.setText(addAndEditPostDTO.getText());
-            post.setViewCount(0);
 
-            SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            post.setUser(userService.getUserById(securityUser.getUserId()));
+
+            post.setModerationStatus(isModerator ? post.getModerationStatus() : ModerationStatus.NEW);
 
             if (addAndEditPostDTO.getTimestamp() < System.currentTimeMillis() / 1000) {
                 post.setTime(Calendar.getInstance().getTime());
@@ -236,7 +300,10 @@ public class PostsService {
                     .collect(Collectors.toList());
 
             if (!(currentTagId.containsAll(newTagsId) && newTagsId.containsAll(currentTagId))) {
-                List<Tag2Post> relations = newTags.stream().map(t -> new Tag2Post(post, t)).collect(Collectors.toList());
+                List<Tag2Post> relations = newTags
+                        .stream()
+                        .map(t -> new Tag2Post(post, t))
+                        .collect(Collectors.toList());
                 tag2PostService.overwritePostRelations(post.getId(), relations);
             } else if (currentTagId.size() == 0) {
                 tag2PostService.putRelations(addAndEditPostDTO.getTags(), post);
@@ -259,10 +326,6 @@ public class PostsService {
     }
 
     public Integer getPostsForModerationCount() {
-        return postRepository.getPostsForModerationCount();
-    }
-
-    public Integer getUserPostsCount() {
         return postRepository.getPostsForModerationCount();
     }
 

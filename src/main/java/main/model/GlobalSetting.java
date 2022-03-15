@@ -22,6 +22,12 @@ public class GlobalSetting {
     public GlobalSetting() {
     }
 
+    public GlobalSetting(String code, String name, String value) {
+        this.code = code;
+        this.name = name;
+        this.value = value;
+    }
+
     public Integer getId() {
         return id;
     }

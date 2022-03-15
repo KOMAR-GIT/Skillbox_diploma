@@ -18,9 +18,15 @@ public class PostQueryBuilder {
             "   p.title," +
             "   p.text as announce," +
             "   p.view_count as viewCount," +
-            "   (select count(*) from blogengine.posts join post_comments on posts.id = post_comments.post_id where posts.id = p.id) AS commentCount," +
-            "   (select count(*) from blogengine.posts join post_votes on posts.id = post_votes.post_id where posts.id = p.id and post_votes.value = 1) AS likeCount," +
-            "   (select count(*) from blogengine.posts join post_votes on posts.id = post_votes.post_id where posts.id = p.id and post_votes.value = 0) AS dislikeCount " +
+            "   (select count(*) from blogengine.posts " +
+            "       join post_comments on posts.id = post_comments.post_id " +
+            "       where posts.id = p.id) AS commentCount," +
+            "   (select count(*) from blogengine.posts " +
+            "       join post_votes on posts.id = post_votes.post_id " +
+            "       where posts.id = p.id and post_votes.value = 1) AS likeCount," +
+            "   (select count(*) from blogengine.posts " +
+            "       join post_votes on posts.id = post_votes.post_id " +
+            "       where posts.id = p.id and post_votes.value = 0) AS dislikeCount " +
             " FROM" +
             "   blogengine.posts p " +
             " LEFT JOIN " +
@@ -28,9 +34,7 @@ public class PostQueryBuilder {
             " LEFT JOIN " +
             "   users u ON p.user_id = u.id " +
             " LEFT JOIN " +
-            "   post_votes pv ON p.id = pv.post_id " +
-            " WHERE " +
-            "   ";
+            "   post_votes pv ON p.id = pv.post_id ";
 
     private final static String groupQuery = " GROUP BY p.id ";
     private final static String limitQuery = " LIMIT :limit ";
@@ -61,10 +65,9 @@ public class PostQueryBuilder {
         return this;
     }
 
-    public Query build(EntityManager entityManager, boolean isPostsForModerationOrUser) {
+    public Query build(EntityManager entityManager) {
         Query query = entityManager.createNativeQuery(generalQuery
-                + (isPostsForModerationOrUser ? "" : generalFilterQuery)
-                + ((filter.isEmpty() || isPostsForModerationOrUser) ? "" : " and ")
+                + (filter.isEmpty() ? "" : " where ")
                 + String.join(" and ", filter)
                 + groupQuery
                 + (order.isEmpty() ? "" : " ORDER BY ")

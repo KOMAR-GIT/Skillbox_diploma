@@ -12,6 +12,11 @@ public class StatisticResponse {
     private Long firstPublication;
 
     public StatisticResponse() {
+        postsCount = 0;
+        likesCount = 0;
+        dislikesCount = 0;
+        viewsCount = 0;
+        firstPublication = 0L;
     }
 
     public StatisticResponse(Integer postsCount, Integer likesCount, Integer dislikesCount, Integer viewsCount, Long firstPublication) {

@@ -1,9 +1,7 @@
 package main.service;
 
 import main.api.response.AddCommentResponse;
-import main.api.response.ResponseWithErrors;
 import main.dto.interfaces.CommentInterface;
-import main.dto.interfaces.PostInterface;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.User;

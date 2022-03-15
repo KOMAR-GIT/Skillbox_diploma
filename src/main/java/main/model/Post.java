@@ -2,7 +2,6 @@ package main.model;
 
 import main.dto.CalendarDTO;
 import main.dto.PostDto;
-import main.dto.StatisticsDTO;
 import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;

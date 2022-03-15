@@ -64,7 +64,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     @Query(value = countQuery + filterQuery, nativeQuery = true)
     Integer getPostsCount();
 
-    @Query(value = countQuery, nativeQuery = true)
+    @Query(value = countQuery + " and moderation_status = \"NEW\"", nativeQuery = true)
     Integer getPostsForModerationCount();
 
     @Query(value = "SELECT COUNT(*) FROM posts p where :where ", nativeQuery = true)

@@ -1,6 +1,5 @@
 package main.repository;
 
-import main.dto.GlobalSettingsCodes;
 import main.dto.interfaces.GlobalSettingsInterface;
 import main.model.GlobalSetting;
 import org.springframework.data.jpa.repository.Query;

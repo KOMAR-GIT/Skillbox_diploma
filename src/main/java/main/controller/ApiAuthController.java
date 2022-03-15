@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.security.Principal;
+import java.util.Objects;
 
 @RestController
 public class ApiAuthController {
@@ -117,9 +118,7 @@ public class ApiAuthController {
     @GetMapping("/api/statistics/my")
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<StatisticResponse> userStatistics() {
-        StatisticsInterface statisticsInterface = statisticsService.getUserStatistics();
-        StatisticResponse statisticResponse = modelMapper.map(statisticsInterface, StatisticResponse.class);
-        statisticResponse.setFirstPublication(statisticResponse.getFirstPublication() / 1000);
+        StatisticResponse statisticResponse = statisticsService.getUserStatistics();
         return ResponseEntity.ok(statisticResponse);
     }
 
@@ -129,7 +128,7 @@ public class ApiAuthController {
         SecurityUser securityUser = auth.getName().equals("anonymousUser")
                 ? null : (SecurityUser) auth.getPrincipal();
         if (settingsService.getOneSetting(GlobalSettingsCodes.STATISTICS_IS_PUBLIC) ||
-                securityUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("user:moderate"))) {
+                Objects.requireNonNull(securityUser).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("user:moderate"))) {
             StatisticsInterface statisticsInterface = statisticsService.getGlobalStatistics();
             StatisticResponse statisticResponse = modelMapper.map(statisticsInterface, StatisticResponse.class);
             statisticResponse.setFirstPublication(statisticResponse.getFirstPublication() / 1000);
@@ -144,8 +143,14 @@ public class ApiAuthController {
     }
 
     @PostMapping("/api/auth/password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         return ResponseEntity.ok(authCheckService.changePassword(changePasswordRequest));
+    }
+
+    @PutMapping("/api/settings")
+    public ResponseEntity<?> saveSettings(@RequestBody SettingsRequest settingsRequest) {
+        return settingsService.saveSettings(settingsRequest) ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(401).build();
     }
 
 }

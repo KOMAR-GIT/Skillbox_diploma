@@ -2,16 +2,17 @@ package main.controller;
 
 import main.api.request.AddCommentRequest;
 import main.api.request.LikeDislikeRequest;
+import main.api.request.ModerationDecisionRequest;
 import main.api.response.*;
 import main.dto.*;
 import main.dto.interfaces.CommentInterface;
 import main.dto.interfaces.PostInterface;
+import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
 import main.security.SecurityUser;
 import main.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -107,14 +108,26 @@ public class ApiPostController {
                 tagsService.getPostTags(id)));
     }
 
+
     @GetMapping("/api/post/moderation")
     @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<PostsResponse> getPostsForModeration(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        List<PostDto> posts = postsService.getPostsForModeration(offset, limit);
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            @RequestParam(value = "status", defaultValue = "NEW") String status) {
+
+        List<PostDto> posts =
+                postsService.getPostsForModeration(offset, limit,
+                        ModerationStatus.valueOf(status.toUpperCase()));
         posts.forEach(postDto -> postDto.editAnnounceText(postDto.getAnnounce()));
         return ResponseEntity.ok(new PostsResponse(postsService.getPostsForModerationCount(), posts));
+    }
+
+    @PostMapping("/api/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    public ResponseEntity<?> moderatePost(
+            @RequestBody ModerationDecisionRequest request) {
+        return ResponseEntity.ok(new SuccessResultResponse(postsService.getModerationDecision(request)));
     }
 
     @GetMapping("/api/post/my")
@@ -139,7 +152,7 @@ public class ApiPostController {
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<?> postImage(@RequestParam("image") MultipartFile photo) throws IOException {
         PostImageResponse response = authCheckService.postImage(photo);
-        if(response.isResult()){
+        if (response.isResult()) {
             return ResponseEntity.ok(response.getPath());
         }
         return ResponseEntity.ok(response);
@@ -156,7 +169,8 @@ public class ApiPostController {
     @PostMapping("/api/comment")
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest addCommentRequest) {
-        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityUser securityUser = (SecurityUser)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AddCommentResponse addCommentResponse = postCommentsService.addComment(
                 addCommentRequest.getParentId(),
                 addCommentRequest.getPostId(),
@@ -172,21 +186,26 @@ public class ApiPostController {
 
     @PostMapping("/api/post/like")
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<LikeDislikeResponse> like(@RequestBody LikeDislikeRequest likeDislikeRequest){
-        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LikeDislikeResponse likeDislikeResponse = postVotesService.addLike(likeDislikeRequest.getPostId(), securityUser.getUserId());
+    public ResponseEntity<LikeDislikeResponse> like(@RequestBody LikeDislikeRequest likeDislikeRequest) {
+        SecurityUser securityUser = (SecurityUser)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LikeDislikeResponse likeDislikeResponse = postVotesService.addLike(
+                likeDislikeRequest.getPostId(),
+                securityUser.getUserId());
+
         return ResponseEntity.ok(likeDislikeResponse);
     }
 
     @PostMapping("/api/post/dislike")
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<LikeDislikeResponse> dislike(@RequestBody LikeDislikeRequest likeDislikeRequest){
-        SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LikeDislikeResponse likeDislikeResponse = postVotesService.addDislike(likeDislikeRequest.getPostId(), securityUser.getUserId());
+    public ResponseEntity<LikeDislikeResponse> dislike(@RequestBody LikeDislikeRequest likeDislikeRequest) {
+        SecurityUser securityUser = (SecurityUser)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LikeDislikeResponse likeDislikeResponse = postVotesService.addDislike(
+                likeDislikeRequest.getPostId(),
+                securityUser.getUserId());
         return ResponseEntity.ok(likeDislikeResponse);
     }
-
-
 
 
     public PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
