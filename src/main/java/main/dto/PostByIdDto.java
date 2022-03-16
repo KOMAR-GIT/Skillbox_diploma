@@ -2,23 +2,23 @@ package main.dto;
 
 import java.util.Date;
 
-public class PostByIdDTO {
+public class PostByIdDto {
 
     private Integer id;
     private Long timestamp;
     private boolean active;
-    private UserDtoForPost user;
+    private UserForPostDto user;
     private String title;
     private String text;
     private Integer likeCount;
     private Integer dislikeCount;
     private Integer viewCount;
 
-    public PostByIdDTO() {
+    public PostByIdDto() {
     }
 
 
-    public PostByIdDTO(Integer id,
+    public PostByIdDto(Integer id,
                        Date timestamp,
                        Boolean active,
                        Integer userId,
@@ -31,7 +31,7 @@ public class PostByIdDTO {
         this.id = id;
         this.timestamp = timestamp.getTime();
         this.active = active;
-        user = new UserDtoForPost(userId, userName);
+        user = new UserForPostDto(userId, userName);
         this.title = title;
         this.text = text;
         this.likeCount = likeCount;
@@ -63,11 +63,11 @@ public class PostByIdDTO {
         this.active = active;
     }
 
-    public UserDtoForPost getUser() {
+    public UserForPostDto getUser() {
         return user;
     }
 
-    public void setUser(UserDtoForPost user) {
+    public void setUser(UserForPostDto user) {
         this.user = user;
     }
 

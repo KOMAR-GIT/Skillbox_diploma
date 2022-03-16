@@ -9,7 +9,7 @@ public class PostDto {
 
     private Integer id;
     private Long timestamp;
-    private UserDtoForPost user;
+    private UserForPostDto user;
     private String title;
     private String announce;
     private Integer likeCount;
@@ -24,7 +24,7 @@ public class PostDto {
     public PostDto(Integer id, Date timestamp, Integer userId, String name, String title, String announce, Integer likeCount, Integer dislikeCount, Integer commentCount, Integer viewCount) {
         this.id = id;
         this.timestamp = timestamp.getTime() / 1000;
-        user = new UserDtoForPost(userId,name);
+        user = new UserForPostDto(userId,name);
         this.title = title;
         this.announce = announce;
         this.likeCount = likeCount;
@@ -60,11 +60,11 @@ public class PostDto {
         this.timestamp = timestamp;
     }
 
-    public UserDtoForPost getUser() {
+    public UserForPostDto getUser() {
         return user;
     }
 
-    public void setUser(UserDtoForPost user) {
+    public void setUser(UserForPostDto user) {
         this.user = user;
     }
 

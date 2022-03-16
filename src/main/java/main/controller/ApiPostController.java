@@ -8,6 +8,7 @@ import main.dto.*;
 import main.dto.interfaces.CommentInterface;
 import main.dto.interfaces.PostInterface;
 import main.model.enums.ModerationStatus;
+import main.model.enums.PostOutputMode;
 import main.model.enums.PostStatus;
 import main.security.SecurityUser;
 import main.service.*;
@@ -143,7 +144,7 @@ public class ApiPostController {
 
     @PostMapping("/api/post")
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<ResponseWithErrors> addPost(@RequestBody AddAndEditPostDTO addAndEditPostDTO) {
+    public ResponseEntity<ResponseWithErrors> addPost(@RequestBody AddAndEditPostDto addAndEditPostDTO) {
         ResponseWithErrors responseWithErrors = postsService.addPost(addAndEditPostDTO);
         return ResponseEntity.ok(responseWithErrors);
     }
@@ -161,7 +162,7 @@ public class ApiPostController {
     @PutMapping("/api/post/{id}")
     public ResponseEntity<ResponseWithErrors> editPost(
             @PathVariable Integer id,
-            @RequestBody AddAndEditPostDTO addAndEditPostDTO) {
+            @RequestBody AddAndEditPostDto addAndEditPostDTO) {
         ResponseWithErrors responseWithErrors = postsService.editPost(id, addAndEditPostDTO);
         return ResponseEntity.ok(responseWithErrors);
     }
@@ -208,8 +209,8 @@ public class ApiPostController {
     }
 
 
-    public PostCommentsDTO convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
-        PostCommentsDTO postCommentsDTO = modelMapper.map(commentInterface, PostCommentsDTO.class);
+    public PostCommentsDto convertPostCommentToPostCommentsDTO(CommentInterface commentInterface) {
+        PostCommentsDto postCommentsDTO = modelMapper.map(commentInterface, PostCommentsDto.class);
         postCommentsDTO.setTimestamp(postCommentsDTO.getTimestamp() / 1000);
         return postCommentsDTO;
     }

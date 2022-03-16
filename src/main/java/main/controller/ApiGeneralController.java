@@ -4,7 +4,7 @@ import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
 import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
-import main.dto.TagDTO;
+import main.dto.TagDto;
 import main.dto.interfaces.TagInterface;
 import main.service.CalendarService;
 import main.service.SettingsService;
@@ -72,8 +72,8 @@ public class ApiGeneralController {
     }
 
 
-    private TagDTO convertTagToTagDTO(TagInterface tagInterface) {
-        return modelMapper.map(tagInterface, TagDTO.class);
+    private TagDto convertTagToTagDTO(TagInterface tagInterface) {
+        return modelMapper.map(tagInterface, TagDto.class);
     }
 
 }

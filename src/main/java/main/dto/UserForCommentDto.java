@@ -1,15 +1,15 @@
 package main.dto;
 
-public class UserForCommentDTO {
+public class UserForCommentDto {
 
     private int id;
     private String name;
     private String photo;
 
-    public UserForCommentDTO() {
+    public UserForCommentDto() {
     }
 
-    public UserForCommentDTO(int id, String name, String photo) {
+    public UserForCommentDto(int id, String name, String photo) {
         this.id = id;
         this.name = name;
         this.photo = photo;

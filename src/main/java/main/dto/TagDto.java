@@ -1,6 +1,6 @@
 package main.dto;
 
-public class TagDTO {
+public class TagDto {
 
     private String name;
 

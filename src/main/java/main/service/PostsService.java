@@ -3,16 +3,16 @@ package main.service;
 import main.api.request.ModerationDecisionRequest;
 import main.api.response.PostsResponse;
 import main.api.response.ResponseWithErrors;
-import main.dto.AddAndEditPostDTO;
-import main.dto.ErrorsForAddingPost;
+import main.dto.AddAndEditPostDto;
+import main.dto.errorMessages.ErrorsForAddingPost;
 import main.dto.interfaces.PostInterface;
 import main.model.Post;
 import main.model.Tag;
 import main.model.Tag2Post;
 import main.model.User;
 import main.model.enums.ModerationStatus;
+import main.model.enums.PostOutputMode;
 import main.model.enums.PostStatus;
-import main.repository.DAO.PostDAO;
 import main.repository.DAO.builder.PostQueryBuilder;
 import main.repository.PostRepository;
 import main.security.SecurityUser;
@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,29 +31,30 @@ import java.util.stream.Collectors;
 public class PostsService {
 
     private final PostRepository postRepository;
-    private final PostDAO postDAO;
     private final UserService userService;
     private final Tag2PostService tag2PostService;
     private final TagsService tagsService;
     private final ModelMapper modelMapper;
+    private final EntityManager entityManager;
 
     public PostsService(PostRepository postRepository,
-                        PostDAO postDAO,
                         UserService userService,
                         Tag2PostService tag2PostService,
                         TagsService tagsService,
-                        ModelMapper modelMapper) {
+                        ModelMapper modelMapper,
+                        EntityManager entityManager) {
         this.postRepository = postRepository;
-        this.postDAO = postDAO;
         this.userService = userService;
         this.tag2PostService = tag2PostService;
         this.tagsService = tagsService;
         this.modelMapper = modelMapper;
+        this.entityManager = entityManager;
     }
 
     public List getPostsForModeration(int offset, int limit, ModerationStatus status) {
-        return postDAO.getPostsForModerator(
-                new PostQueryBuilder(offset, limit).where(" p.moderation_status = \"" + status + "\""));
+        return postRepository.getPostsForModerator(
+                new PostQueryBuilder(offset, limit).where(" p.moderation_status = \"" + status + "\""),
+                entityManager);
     }
 
     public boolean getModerationDecision(ModerationDecisionRequest request) {
@@ -102,7 +104,7 @@ public class PostsService {
                 sortMode = "p.time";
 
         }
-        return postDAO.getPosts(new PostQueryBuilder(offset, limit).order(sortMode));
+        return postRepository.getPosts(new PostQueryBuilder(offset, limit).order(sortMode), entityManager);
     }
 
     public List getPostsByQuery(int offset, int limit, String searchQuery) {
@@ -112,7 +114,7 @@ public class PostsService {
                     .where("match(p.text, title) against(concat(\"*\",:searchQuery, \"*\") IN BOOLEAN MODE) ")
                     .parameter("searchQuery", searchQuery);
         }
-        return postDAO.getPosts(postQueryBuilder);
+        return postRepository.getPosts(postQueryBuilder, entityManager);
     }
 
     public List getPostsByDate(int offset, int limit, LocalDate date) {
@@ -122,7 +124,7 @@ public class PostsService {
                     .where(" date(p.time) =  :date ")
                     .parameter("date", String.valueOf(date));
         }
-        return postDAO.getPosts(postQueryBuilder);
+        return postRepository.getPosts(postQueryBuilder, entityManager);
     }
 
     public List getPostsByTag(int offset, int limit, String tag) {
@@ -138,7 +140,7 @@ public class PostsService {
                             "    where t.name = :tag) ")
                     .parameter("tag", tag);
         }
-        return postDAO.getPosts(postQueryBuilder);
+        return postRepository.getPosts(postQueryBuilder, entityManager);
     }
 
     public PostsResponse getUserPosts(int offset, int limit, PostStatus status) {
@@ -167,7 +169,7 @@ public class PostsService {
         SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
         postQueryBuilder.where(" u.id = " + securityUser.getUserId());
         return new PostsResponse(postRepository.getUserPostsCount(countFilterQuery),
-                postDAO.getPostsForUser(postQueryBuilder));
+                postRepository.getPostsForUser(postQueryBuilder, entityManager));
     }
 
 
@@ -211,12 +213,12 @@ public class PostsService {
                     .noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
                 postRepository.increasePostViewsCount(post.getId());
             }
-        }else{
+        } else {
             postRepository.increasePostViewsCount(post.getId());
         }
     }
 
-    public ResponseWithErrors addPost(AddAndEditPostDTO addAndEditPostDTO) {
+    public ResponseWithErrors addPost(AddAndEditPostDto addAndEditPostDTO) {
         HashMap<String, String> errors = new HashMap<>();
         checkTextAndString(errors, addAndEditPostDTO.getTitle(), addAndEditPostDTO.getText());
 
@@ -252,7 +254,7 @@ public class PostsService {
         return new ResponseWithErrors(false, errors);
     }
 
-    public ResponseWithErrors editPost(int id, AddAndEditPostDTO addAndEditPostDTO) {
+    public ResponseWithErrors editPost(int id, AddAndEditPostDto addAndEditPostDTO) {
         HashMap<String, String> errors = new HashMap<>();
         checkTextAndString(errors, addAndEditPostDTO.getTitle(), addAndEditPostDTO.getText());
 

@@ -1,4 +1,4 @@
-package main.dto;
+package main.dto.errorMessages;
 
 public class ErrorsForProfile {
 

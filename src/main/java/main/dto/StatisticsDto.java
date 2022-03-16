@@ -1,6 +1,6 @@
 package main.dto;
 
-public class StatisticsDTO {
+public class StatisticsDto {
 
     private Integer postsCount;
     private Integer likesCount;
@@ -8,10 +8,10 @@ public class StatisticsDTO {
     private Integer viewsCount;
     private Long firstPublication;
 
-    public StatisticsDTO() {
+    public StatisticsDto() {
     }
 
-    public StatisticsDTO(Integer postsCount, Integer likesCount, Integer dislikesCount, Integer viewsCount, Long firstPublication) {
+    public StatisticsDto(Integer postsCount, Integer likesCount, Integer dislikesCount, Integer viewsCount, Long firstPublication) {
         this.postsCount = postsCount;
         this.likesCount = likesCount;
         this.dislikesCount = dislikesCount;

@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.CalendarDTO;
+import main.dto.CalendarDto;
 import main.repository.DAO.CalendarDao;
 import main.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class CalendarService {
     }
 
     public Map<LocalDate, Integer> getPostsCountByYear(String year) {
-        List<CalendarDTO> posts = calendarDao.getPostsCountByYear(String.valueOf(year));
-        return posts.stream().collect(Collectors.toMap(CalendarDTO::getDate, CalendarDTO::getCount));
+        List<CalendarDto> posts = calendarDao.getPostsCountByYear(String.valueOf(year));
+        return posts.stream().collect(Collectors.toMap(CalendarDto::getDate, CalendarDto::getCount));
     }
 
     public List<Integer> getYears() {

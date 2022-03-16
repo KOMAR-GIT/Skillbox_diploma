@@ -2,7 +2,7 @@ package main.service;
 
 import main.api.request.SettingsRequest;
 import main.api.response.SettingsResponse;
-import main.dto.GlobalSettingsCodes;
+import main.model.enums.GlobalSettingsCodes;
 import main.dto.interfaces.GlobalSettingsInterface;
 import main.model.GlobalSetting;
 import main.repository.GlobalSettingsRepository;

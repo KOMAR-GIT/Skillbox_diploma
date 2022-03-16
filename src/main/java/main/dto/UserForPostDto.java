@@ -1,15 +1,15 @@
 package main.dto;
 
-public class UserDtoForPost {
+public class UserForPostDto {
 
     private Integer id;
 
     private String name;
 
-    public UserDtoForPost() {
+    public UserForPostDto() {
     }
 
-    public UserDtoForPost(Integer id, String name) {
+    public UserForPostDto(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

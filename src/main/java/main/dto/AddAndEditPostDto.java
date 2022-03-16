@@ -2,7 +2,7 @@ package main.dto;
 
 import java.util.List;
 
-public class AddAndEditPostDTO {
+public class AddAndEditPostDto {
 
     private long timestamp;
     private boolean active;
@@ -10,10 +10,10 @@ public class AddAndEditPostDTO {
     private List<String> tags;
     private String text;
 
-    public AddAndEditPostDTO() {
+    public AddAndEditPostDto() {
     }
 
-    public AddAndEditPostDTO(long timestamp, boolean active, String title, List<String> tags, String text) {
+    public AddAndEditPostDto(long timestamp, boolean active, String title, List<String> tags, String text) {
         this.timestamp = timestamp;
         this.active = active;
         this.title = title;

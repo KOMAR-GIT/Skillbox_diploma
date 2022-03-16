@@ -1,4 +1,4 @@
-package main.dto;
+package main.model.enums;
 
 public enum GlobalSettingsCodes {
     MULTIUSER_MODE,
