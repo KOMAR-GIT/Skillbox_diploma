@@ -3,6 +3,7 @@ package main.repository;
 import main.dto.interfaces.PostInterface;
 import main.dto.interfaces.StatisticsInterface;
 import main.model.Post;
+import main.repository.DAO.builder.PostQueryBuilder;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
@@ -116,4 +118,28 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             " FROM blogengine.posts p", nativeQuery = true)
     StatisticsInterface getGlobalStatistics();
 
+    default List getPosts(PostQueryBuilder postQueryBuilder, EntityManager entityManager) {
+
+        javax.persistence.Query query = postQueryBuilder
+                .where(" is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= curdate() ")
+                .build(entityManager);
+
+        return query.getResultList();
+    }
+
+    default List getPostsForUser(PostQueryBuilder postQueryBuilder, EntityManager entityManager) {
+
+        javax.persistence.Query query = postQueryBuilder.build(entityManager);
+
+        return query.getResultList();
+    }
+
+    default List getPostsForModerator(PostQueryBuilder postQueryBuilder, EntityManager entityManager) {
+
+        javax.persistence.Query query = postQueryBuilder
+                .where(" is_active = 1")
+                .build(entityManager);
+
+        return query.getResultList();
+    }
 }

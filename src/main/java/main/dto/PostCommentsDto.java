@@ -2,21 +2,21 @@ package main.dto;
 
 import java.util.Date;
 
-public class PostCommentsDTO {
+public class PostCommentsDto {
 
     private int id;
     private long timestamp;
     private String text;
-    private UserForCommentDTO user;
+    private UserForCommentDto user;
 
-    public PostCommentsDTO() {
+    public PostCommentsDto() {
     }
 
-    public PostCommentsDTO(int id, Date timestamp, String text, int userId, String name, String photo) {
+    public PostCommentsDto(int id, Date timestamp, String text, int userId, String name, String photo) {
         this.id = id;
         this.timestamp = timestamp.getTime() / 1000;
         this.text = text;
-        user = new UserForCommentDTO(userId, name, photo);
+        user = new UserForCommentDto(userId, name, photo);
     }
 
     public int getId() {
@@ -43,11 +43,11 @@ public class PostCommentsDTO {
         this.text = text;
     }
 
-    public UserForCommentDTO getUser() {
+    public UserForCommentDto getUser() {
         return user;
     }
 
-    public void setUser(UserForCommentDTO user) {
+    public void setUser(UserForCommentDto user) {
         this.user = user;
     }
 }

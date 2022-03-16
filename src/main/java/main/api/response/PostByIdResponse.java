@@ -1,8 +1,8 @@
 package main.api.response;
 
-import main.dto.PostCommentsDTO;
+import main.dto.PostCommentsDto;
 import main.dto.interfaces.PostInterface;
-import main.dto.UserDtoForPost;
+import main.dto.UserForPostDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -14,25 +14,25 @@ public class PostByIdResponse {
     private Integer id;
     private Long timestamp;
     private Byte active;
-    private UserDtoForPost user;
+    private UserForPostDto user;
     private String title;
     private String text;
     private BigInteger likeCount;
     private BigInteger dislikeCount;
     private Integer viewCount;
-    private List<PostCommentsDTO> comments;
+    private List<PostCommentsDto> comments;
     private List<String> tags;
 
     public PostByIdResponse() {
     }
 
     public PostByIdResponse(PostInterface postInterface,
-                            List<PostCommentsDTO> comments,
+                            List<PostCommentsDto> comments,
                             List<String> tags) {
         this.id = postInterface.getId();
         this.timestamp = postInterface.getTimestamp().getTime() / 1000;
         this.active = postInterface.getActive();
-        this.user = new UserDtoForPost(postInterface.getUserId(), postInterface.getUserName());
+        this.user = new UserForPostDto(postInterface.getUserId(), postInterface.getUserName());
         this.title = postInterface.getTitle();
         this.text = postInterface.getText();
         this.likeCount = postInterface.getLikeCount();
@@ -66,11 +66,11 @@ public class PostByIdResponse {
         this.active = active;
     }
 
-    public UserDtoForPost getUser() {
+    public UserForPostDto getUser() {
         return user;
     }
 
-    public void setUser(UserDtoForPost user) {
+    public void setUser(UserForPostDto user) {
         this.user = user;
     }
 
@@ -114,11 +114,11 @@ public class PostByIdResponse {
         this.viewCount = viewCount;
     }
 
-    public List<PostCommentsDTO> getComments() {
+    public List<PostCommentsDto> getComments() {
         return comments;
     }
 
-    public void setComments(List<PostCommentsDTO> comments) {
+    public void setComments(List<PostCommentsDto> comments) {
         this.comments = comments;
     }
 

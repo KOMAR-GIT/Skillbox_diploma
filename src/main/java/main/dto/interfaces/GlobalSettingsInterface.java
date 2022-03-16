@@ -1,6 +1,6 @@
 package main.dto.interfaces;
 
-import main.dto.GlobalSettingsCodes;
+import main.model.enums.GlobalSettingsCodes;
 
 public interface GlobalSettingsInterface {
 

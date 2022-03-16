@@ -2,7 +2,7 @@ package main.dto;
 
 import java.math.BigInteger;
 
-public class UserDTO {
+public class UserDto {
 
     private Integer id;
     private String name;
@@ -12,10 +12,10 @@ public class UserDTO {
     private BigInteger moderationCount;
     private Boolean settings;
 
-    public UserDTO() {
+    public UserDto() {
     }
 
-    public UserDTO(Integer id,
+    public UserDto(Integer id,
                    String name,
                    String photo,
                    String email,

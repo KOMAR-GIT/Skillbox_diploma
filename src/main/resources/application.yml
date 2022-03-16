@@ -17,7 +17,7 @@ spring:
   mail:
     host: smtp.google.com
     username: bogdankomarov.bk@gmail.com
-    password: 
+    password:
     properties:
       mail:
         debug: true

@@ -1,4 +1,4 @@
-package main.service;
+package main.model.enums;
 
 public enum PostOutputMode {
     recent,

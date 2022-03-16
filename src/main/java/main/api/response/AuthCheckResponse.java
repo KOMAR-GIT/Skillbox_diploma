@@ -1,7 +1,7 @@
 package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import main.dto.UserDTO;
+import main.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -10,7 +10,7 @@ public class AuthCheckResponse {
 
     private Boolean result;
 
-    private UserDTO user;
+    private UserDto user;
 
     public AuthCheckResponse() {
     }
@@ -30,11 +30,11 @@ public class AuthCheckResponse {
         this.result = result;
     }
 
-    public UserDTO getUser() {
+    public UserDto getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(UserDto user) {
         this.user = user;
     }
 }

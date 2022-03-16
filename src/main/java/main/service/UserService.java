@@ -1,7 +1,7 @@
 package main.service;
 
 import main.api.response.LoginResponse;
-import main.dto.UserDTO;
+import main.dto.UserDto;
 import main.dto.interfaces.UserInterface;
 import main.model.User;
 import main.repository.UserRepository;
@@ -31,7 +31,7 @@ public class UserService {
         }
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setResult(true);
-        UserDTO userDTO = modelMapper.map(currentUser, UserDTO.class);
+        UserDto userDTO = modelMapper.map(currentUser, UserDto.class);
         loginResponse.setUser(userDTO);
         loginResponse.getUser().setSettings(true);
         return loginResponse;

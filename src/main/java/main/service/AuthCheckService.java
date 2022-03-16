@@ -8,8 +8,8 @@ import main.api.request.EditProfileWithoutPhotoRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.PostImageResponse;
 import main.api.response.ResponseWithErrors;
-import main.dto.ErrorsForProfile;
-import main.dto.UserForRegistrationDTO;
+import main.dto.errorMessages.ErrorsForProfile;
+import main.dto.UserForRegistrationDto;
 import main.model.CaptchaCode;
 import main.model.User;
 import main.repository.CaptchaCodeRepository;
@@ -83,7 +83,7 @@ public class AuthCheckService {
         return captchaCodeRepository.findBySecretCode(secretCode) != null;
     }
 
-    public ResponseWithErrors addNewUser(UserForRegistrationDTO userDTO) {
+    public ResponseWithErrors addNewUser(UserForRegistrationDto userDTO) {
         Map<String, String> errors = new HashMap<>();
         isEmailValid(userDTO.getEmail(), "", errors);
         isNameCorrect(userDTO.getName(), errors);

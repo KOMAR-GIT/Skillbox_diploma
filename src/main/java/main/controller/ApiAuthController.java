@@ -2,8 +2,8 @@ package main.controller;
 
 import main.api.request.*;
 import main.api.response.*;
-import main.dto.GlobalSettingsCodes;
-import main.dto.UserForRegistrationDTO;
+import main.model.enums.GlobalSettingsCodes;
+import main.dto.UserForRegistrationDto;
 import main.dto.interfaces.StatisticsInterface;
 import main.security.SecurityUser;
 import main.service.AuthCheckService;
@@ -68,7 +68,7 @@ public class ApiAuthController {
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<ResponseWithErrors> register(@RequestBody UserForRegistrationDTO user) {
+    public ResponseEntity<ResponseWithErrors> register(@RequestBody UserForRegistrationDto user) {
         ResponseWithErrors responseWithErrors = authCheckService.addNewUser(user);
         return new ResponseEntity<>(responseWithErrors, HttpStatus.OK);
     }

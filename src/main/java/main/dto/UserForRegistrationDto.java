@@ -2,7 +2,7 @@ package main.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UserForRegistrationDTO {
+public class UserForRegistrationDto {
 
     @JsonProperty("e_mail")
     private String email;
@@ -12,10 +12,10 @@ public class UserForRegistrationDTO {
     @JsonProperty("captcha_secret")
     private String captchaSecret;
 
-    public UserForRegistrationDTO() {
+    public UserForRegistrationDto() {
     }
 
-    public UserForRegistrationDTO(String email, String password, String name, String captcha, String captchaSecret) {
+    public UserForRegistrationDto(String email, String password, String name, String captcha, String captchaSecret) {
         this.email = email;
         this.password = password;
         this.name = name;

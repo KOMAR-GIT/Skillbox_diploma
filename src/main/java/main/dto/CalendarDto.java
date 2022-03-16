@@ -2,13 +2,13 @@ package main.dto;
 
 import java.time.LocalDate;
 
-public class CalendarDTO {
+public class CalendarDto {
 
     private LocalDate date;
 
     private int count;
 
-    public CalendarDTO(LocalDate date, Integer count) {
+    public CalendarDto(LocalDate date, Integer count) {
         this.date = date;
         this.count = count;
     }

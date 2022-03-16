@@ -1,6 +1,6 @@
 package main.model;
 
-import main.dto.CalendarDTO;
+import main.dto.CalendarDto;
 import main.dto.PostDto;
 import main.model.enums.ModerationStatus;
 
@@ -32,7 +32,7 @@ import java.util.Date;
 @SqlResultSetMapping(
         name = "CalendarDtoMapping",
         classes = @ConstructorResult(
-                targetClass = CalendarDTO.class,
+                targetClass = CalendarDto.class,
                 columns = {
                         @ColumnResult(name = "date", type = LocalDate.class),
                         @ColumnResult(name = "postsCount", type = Integer.class),
