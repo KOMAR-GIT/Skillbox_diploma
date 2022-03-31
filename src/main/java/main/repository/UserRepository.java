@@ -18,9 +18,9 @@ public interface UserRepository extends CrudRepository<User, Integer> {
             "    u.photo as photo, " +
             "    u.id AS id,  " +
             "    u.is_moderator AS moderation, " +
-            "    (select count(*) from blogengine.posts where moderation_status = \"NEW\" and is_active = 1) as moderationCount " +
+            "    (select count(*) from posts where moderation_status = \"NEW\" and is_active = 1) as moderationCount " +
             "FROM " +
-            "    blogengine.users u " +
+            "    users u " +
             "    where email = :email", nativeQuery = true)
     UserInterface getByEmail(@Param("email") String email);
 

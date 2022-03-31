@@ -18,17 +18,17 @@ public class PostQueryBuilder {
             "   p.title," +
             "   p.text as announce," +
             "   p.view_count as viewCount," +
-            "   (select count(*) from blogengine.posts " +
+            "   (select count(*) from posts " +
             "       join post_comments on posts.id = post_comments.post_id " +
             "       where posts.id = p.id) AS commentCount," +
-            "   (select count(*) from blogengine.posts " +
+            "   (select count(*) from posts " +
             "       join post_votes on posts.id = post_votes.post_id " +
             "       where posts.id = p.id and post_votes.value = 1) AS likeCount," +
-            "   (select count(*) from blogengine.posts " +
+            "   (select count(*) from posts " +
             "       join post_votes on posts.id = post_votes.post_id " +
             "       where posts.id = p.id and post_votes.value = 0) AS dislikeCount " +
             " FROM" +
-            "   blogengine.posts p " +
+            "   posts p " +
             " LEFT JOIN " +
             "   post_comments pc ON post_id = p.id " +
             " LEFT JOIN " +
@@ -39,7 +39,7 @@ public class PostQueryBuilder {
     private final static String groupQuery = " GROUP BY p.id ";
     private final static String limitQuery = " LIMIT :limit ";
     private final static String offsetQuery = " OFFSET :offset ";
-    private final static String generalFilterQuery = " is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= curdate() ";
+    private final static String generalFilterQuery = " is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= utc_timestamp() ";
 
     private final List<String> filter = new ArrayList<>();
     private final List<String> order = new ArrayList<>();

@@ -26,11 +26,11 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     String filterQuery = " and " +
             "   moderation_status = 'ACCEPTED'" +
             " and " +
-            "   time <= curdate()";
+            "   time <= utc_timestamp()";
     String postVotesQuery = "(SELECT " +
             "            COUNT(*)" +
             "        FROM" +
-            "            blogengine.posts" +
+            "            posts" +
             "                JOIN" +
             "            post_votes ON posts.id = post_votes.post_id" +
             "        WHERE" +
@@ -60,7 +60,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE blogengine.posts SET view_count = view_count + 1 WHERE (id = :post_id);", nativeQuery = true)
+    @Query(value = "UPDATE posts SET view_count = view_count + 1 WHERE (id = :post_id);", nativeQuery = true)
     void increasePostViewsCount(@Param("post_id") int postId);
 
     @Query(value = countQuery + filterQuery, nativeQuery = true)
@@ -85,43 +85,41 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     @Query(value = "SELECT " +
             "    count(*)" +
             " FROM " +
-            "    blogengine.posts p" +
-            "    join tag2post tp on p.id = post_id" +
+            "    posts p" +
             " WHERE" +
             "    p.id in (select post_id from tag2post join tags t on tag_id = t.id where t.name = :tag)" +
             " AND" +
             "    p.is_active = 1 "
-            + filterQuery +
-            " GROUP BY tp.tag_id", nativeQuery = true)
+            + filterQuery, nativeQuery = true)
     Integer getPostsCountByTag(@Param("tag") String tag);
 
-    @Query(value = "SELECT year(time) year FROM blogengine.posts " +
+    @Query(value = "SELECT year(time) year FROM posts " +
             "WHERE is_active = 1 " +
             "   and moderation_status = 'ACCEPTED' " +
-            "   and time <= curdate() " +
+            "   and time <= utc_timestamp() " +
             "group by year order by year;", nativeQuery = true)
     List<Integer> getYears();
 
     @Query(value = " SELECT count(*) postsCount, " +
-            " (SELECT count(*) FROM blogengine.post_votes where post_id = p.id and value = 1) likesCount, " +
-            " (SELECT count(*) FROM blogengine.post_votes where post_id = p.id and value = 0) dislikesCount, " +
+            " (SELECT count(*) FROM post_votes where post_id = p.id and value = 1) likesCount, " +
+            " (SELECT count(*) FROM post_votes where post_id = p.id and value = 0) dislikesCount, " +
             " (SELECT SUM(posts.view_count) from posts where user_id = p.user_id ) viewsCount, " +
             " min(p.time) firstPublication " +
-            " FROM blogengine.posts p where p.user_id = :id", nativeQuery = true)
+            " FROM posts p where p.user_id = :id", nativeQuery = true)
     StatisticsInterface getUserStatistics(@Param("id") int id);
 
     @Query(value = " SELECT count(*) postsCount, " +
-            " (SELECT count(*) FROM blogengine.post_votes where value = 1) likesCount, " +
-            " (SELECT count(*) FROM blogengine.post_votes where value = 0) dislikesCount, " +
+            " (SELECT count(*) FROM post_votes where value = 1) likesCount, " +
+            " (SELECT count(*) FROM post_votes where value = 0) dislikesCount, " +
             " (SELECT SUM(posts.view_count) from posts) viewsCount, " +
             " min(p.time) firstPublication " +
-            " FROM blogengine.posts p", nativeQuery = true)
+            " FROM posts p", nativeQuery = true)
     StatisticsInterface getGlobalStatistics();
 
     default List getPosts(PostQueryBuilder postQueryBuilder, EntityManager entityManager) {
 
         javax.persistence.Query query = postQueryBuilder
-                .where(" is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= curdate() ")
+                .where(" is_active = 1 and moderation_status = 'ACCEPTED' and p.time <= utc_timestamp() ")
                 .build(entityManager);
 
         return query.getResultList();

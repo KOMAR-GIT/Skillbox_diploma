@@ -5,7 +5,9 @@ import main.model.Tag;
 import main.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TagsService {
@@ -27,11 +29,25 @@ public class TagsService {
         return tagInterfaces;
     }
 
-    public List<String> getPostTags(int postId){
+    public void addTags(List<String> tags) {
+        List<String> existsTagList = getTagsByNames(tags).stream().map(Tag::getName).collect(Collectors.toList());
+        List<Tag> newTags = new ArrayList<>();
+        for (String tag : tags) {
+            if (!existsTagList.contains(tag.toUpperCase())) {
+                newTags.add(new Tag(tag.toUpperCase()));
+            }
+        }
+
+        if (!newTags.isEmpty()) {
+            tagRepository.saveAll(newTags);
+        }
+    }
+
+    public List<String> getPostTags(int postId) {
         return tagRepository.getPostTags(postId);
     }
 
-    public List<Tag> getTagsByNames(List<String> tagNames){
+    public List<Tag> getTagsByNames(List<String> tagNames) {
         return tagRepository.findTagsByNameIn(tagNames);
     }
 

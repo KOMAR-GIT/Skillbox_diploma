@@ -27,6 +27,7 @@ public class PostByIdResponse {
     }
 
     public PostByIdResponse(PostInterface postInterface,
+                            boolean isIncreased,
                             List<PostCommentsDto> comments,
                             List<String> tags) {
         this.id = postInterface.getId();
@@ -37,7 +38,7 @@ public class PostByIdResponse {
         this.text = postInterface.getText();
         this.likeCount = postInterface.getLikeCount();
         this.dislikeCount = postInterface.getDislikeCount();
-        this.viewCount = postInterface.getViewCount();
+        this.viewCount = isIncreased ? postInterface.getViewCount() + 1 : postInterface.getViewCount();
         this.comments = comments;
         this.tags = tags;
     }

@@ -76,9 +76,9 @@ insert into post_comments (id, text, time, parent_id, post_id, user_id) values (
 insert into post_comments (id, text, time, parent_id, post_id, user_id) values (8, 'йцук', '2021-8-1', null, 5, 2);
 insert into post_comments (id, text, time, parent_id, post_id, user_id) values (9, 'нннн', '2021-9-1', null, 1, 3);
 
-insert into tags (id, name) values (1,'one');
-insert into tags (id, name) values (2,'two');
-insert into tags (id, name) values (3,'three');
+insert into tags (id, name) values (1,'ONE');
+insert into tags (id, name) values (2,'TWO');
+insert into tags (id, name) values (3,'THREE');
 
 insert into tag2post(id, post_id, tag_id) values (1, 1, 1);
 insert into tag2post(id, post_id, tag_id) values (2, 2, 2);
@@ -86,5 +86,4 @@ insert into tag2post(id, post_id, tag_id) values (3, 3, 1);
 insert into tag2post(id, post_id, tag_id) values (4, 4, 3);
 insert into tag2post(id, post_id, tag_id) values (5, 5, 3);
 
-ALTER TABLE `blogengine`.`posts`
-ADD FULLTEXT INDEX `fulltext_search_index` (`title`, `text`) VISIBLE;
+

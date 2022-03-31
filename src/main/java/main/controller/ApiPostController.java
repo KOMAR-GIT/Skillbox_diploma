@@ -97,11 +97,12 @@ public class ApiPostController {
     public ResponseEntity<PostByIdResponse> getPostsById(
             @PathVariable Integer id) {
         PostInterface post = postsService.getPostById(id);
+
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        postsService.increasePostViewsCount(post);
-        return ResponseEntity.ok(new PostByIdResponse(post, postCommentsService
+        boolean isIncreased = postsService.increasePostViewsCount(post);
+        return ResponseEntity.ok(new PostByIdResponse(post,isIncreased, postCommentsService
                 .getComments(id)
                 .stream()
                 .map(this::convertPostCommentToPostCommentsDTO)
