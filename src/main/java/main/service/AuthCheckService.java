@@ -8,13 +8,14 @@ import main.api.request.EditProfileWithoutPhotoRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.PostImageResponse;
 import main.api.response.ResponseWithErrors;
-import main.dto.errorMessages.ErrorsForProfile;
 import main.dto.UserForRegistrationDto;
+import main.dto.errorMessages.ErrorsForProfile;
 import main.model.CaptchaCode;
 import main.model.User;
 import main.repository.CaptchaCodeRepository;
 import main.repository.UserRepository;
 import main.security.SecurityUser;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
@@ -312,15 +313,15 @@ public class AuthCheckService {
                 }
             }
             BufferedImage userImage = ImageIO.read(photo.getInputStream());
-            if (userPhoto) {
-                userImage = userImage.getSubimage(0, 0, 36, 36);
-            }
             photoPath.append("/")
                     .append(UUID.randomUUID().toString())
                     .append(originalPhotoName)
                     .append(".")
                     .append(photoFormat);
             File file = new File(photoPath.toString());
+            if (userPhoto) {
+                userImage = Thumbnails.of(userImage).size(30, 30).asBufferedImage();
+            }
             ImageIO.write(userImage, photoFormat, file);
             photoPath.insert(0, "/");
             return photoPath.toString();

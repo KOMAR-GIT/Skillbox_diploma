@@ -25,13 +25,13 @@ public class CalendarDao {
                 "SELECT " +
                         "    DATE(time) AS date, COUNT(time) postsCount " +
                         " FROM " +
-                        "    blogengine.posts " +
+                        "    posts " +
                         " WHERE " +
                         "    is_active = 1 " +
                         " AND " +
                         "    moderation_status = 'ACCEPTED' " +
                         " AND " +
-                        "    time <= CURDATE() " +
+                        "    time <= utc_timestamp() " +
                         " AND " +
                         "    YEAR(time) = :year " +
                         "GROUP BY " +

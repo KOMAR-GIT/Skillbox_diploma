@@ -6,3 +6,6 @@ create table posts (id integer not null AUTO_INCREMENT, is_active tinyint not nu
 create table tag2post (id integer not null AUTO_INCREMENT, post_id integer not null, tag_id integer not null, primary key (id));
 create table tags (id integer not null AUTO_INCREMENT, name VARCHAR(255), primary key (id));
 create table users (id integer not null AUTO_INCREMENT, code VARCHAR(255), email VARCHAR(255) not null, is_moderator TINYINT not null, name VARCHAR(255) not null, password VARCHAR(255) not null, photo TEXT, reg_time DATETIME not null, primary key (id));
+
+ALTER TABLE `posts`
+ADD FULLTEXT INDEX `fulltext_search_index` (`title`, `text`) VISIBLE;

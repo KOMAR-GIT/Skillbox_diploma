@@ -76,7 +76,7 @@ public class PostsService {
             SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
             User user = new User();
             user.setId(securityUser.getUserId());
-            post.setUser(user);
+            post.setModerator(user);
             postRepository.save(post);
             return true;
         }
@@ -186,6 +186,7 @@ public class PostsService {
                 .stream()
                 .anyMatch(a -> a.getAuthority().equals("user:moderate"));
 
+
         if (securityUser == null
                 || !securityUser.getUserId().equals(post.getUserId())
                 || isModerator) {
@@ -202,7 +203,7 @@ public class PostsService {
         }
     }
 
-    public void increasePostViewsCount(PostInterface post) {
+    public boolean increasePostViewsCount(PostInterface post) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getName().equals("anonymousUser")) {
             SecurityUser securityUser = (SecurityUser) auth.getPrincipal();
@@ -212,9 +213,12 @@ public class PostsService {
                     .stream()
                     .noneMatch(a -> a.getAuthority().equals("user:moderate"))) {
                 postRepository.increasePostViewsCount(post.getId());
+                return true;
             }
+            return false;
         } else {
             postRepository.increasePostViewsCount(post.getId());
+            return true;
         }
     }
 
@@ -244,8 +248,8 @@ public class PostsService {
             } else {
                 post.setTime(new Date(addAndEditPostDTO.getTimestamp() * 1000));
             }
-
             postRepository.save(post);
+            tagsService.addTags(addAndEditPostDTO.getTags());
             tag2PostService.putRelations(addAndEditPostDTO.getTags(), post);
 
             return new ResponseWithErrors(true, null);
@@ -288,6 +292,8 @@ public class PostsService {
             }
 
             postRepository.save(post);
+
+            tagsService.addTags(addAndEditPostDTO.getTags());
 
             List<Integer> currentTagId = tag2PostService
                     .getRelationsByPostId(post.getId())

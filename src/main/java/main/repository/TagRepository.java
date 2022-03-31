@@ -16,7 +16,7 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             "    t.name AS name, " +
             "    (SELECT count(p.id) WHERE p.id = post_id) AS postsCount " +
             "FROM " +
-            "    blogengine.tag2post " +
+            "    tag2post " +
             "JOIN tags t ON t.id = tag_id " +
             "JOIN posts p ON p.id = post_id " +
             "WHERE name like '?1%' " +
@@ -44,7 +44,7 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             "       and " +
             "           moderation_status = 'ACCEPTED'  " +
             "       and " +
-            "           p.time <= curdate()), " +
+            "           p.time <= utc_timestamp()), " +
             "    weights" +
             "    AS" +
             "       (SELECT " +
@@ -61,7 +61,7 @@ public interface TagRepository extends CrudRepository<Tag, Integer> {
             "           JOIN posts p on tp.post_id = p.id " +
             "        WHERE p.is_active = 1 " +
             "           AND p.moderation_status = 'ACCEPTED' " +
-            "           AND p.time <= CURDATE() " +
+            "           AND p.time <= utc_timestamp() " +
             "        GROUP BY tp.tag_id)" +
             " SELECT " +
             "   name," +
