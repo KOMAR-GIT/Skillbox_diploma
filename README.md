@@ -36,7 +36,7 @@ Spring Boot Framework.
 
 **Основная страница с постами**
 
-![](upload\preview for readme\main page.png)
+![alt text](upload\preview for readme\main page.png)
 
 **Поиск по датам**
 
