@@ -36,16 +36,16 @@ Spring Boot Framework.
 
 **Основная страница с постами**
 
-![alt text](upload\preview for readme\main page.png)
+![Image alt](https://github.com/KOMAR-GIT/Skillbox_diploma/raw/dev/preview%20for%20readme/main%20page.png)
 
 **Поиск по датам**
 
-![](upload\preview for readme\calendar.png)
+![Image alt](https://github.com/KOMAR-GIT/Skillbox_diploma/raw/dev/preview%20for%20readme/calendar.png)
 
 **Страница регистрации**
 
-![](upload\preview for readme\calendar.png)
+![Image alt](https://github.com/KOMAR-GIT/Skillbox_diploma/raw/dev/preview%20for%20readme/reg.png)
 
 **Страница поста с комментариями пользователей**
 
-![](upload\preview for readme\post.png)
+![Image alt](https://github.com/KOMAR-GIT/Skillbox_diploma/raw/dev/preview%20for%20readme/post.png)
